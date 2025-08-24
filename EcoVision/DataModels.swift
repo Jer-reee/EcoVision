@@ -92,7 +92,7 @@ extension WasteCollectionRecord {
         return collections
     }
 }
-
+//how often the collection is done
 enum CollectionFrequency {
     case weekly
     case fortnightly
