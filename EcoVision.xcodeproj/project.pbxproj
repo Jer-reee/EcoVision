@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		C448AFB12E447AB3004CDA11 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -72,6 +76,7 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+
 		C448AF9A2E447AB1004CDA11 = {
 			isa = PBXGroup;
 			children = (
@@ -111,8 +116,6 @@
 				C448AFA52E447AB1004CDA11 /* EcoVision */,
 			);
 			name = EcoVision;
-			packageProductDependencies = (
-			);
 			productName = EcoVision;
 			productReference = C448AFA32E447AB1004CDA11 /* EcoVision.app */;
 			productType = "com.apple.product-type.application";
@@ -134,8 +137,6 @@
 				C448AFB32E447AB3004CDA11 /* EcoVisionTests */,
 			);
 			name = EcoVisionTests;
-			packageProductDependencies = (
-			);
 			productName = EcoVisionTests;
 			productReference = C448AFB02E447AB3004CDA11 /* EcoVisionTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -157,8 +158,6 @@
 				C448AFBD2E447AB3004CDA11 /* EcoVisionUITests */,
 			);
 			name = EcoVisionUITests;
-			packageProductDependencies = (
-			);
 			productName = EcoVisionUITests;
 			productReference = C448AFBA2E447AB3004CDA11 /* EcoVisionUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
@@ -230,6 +229,8 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+
 
 /* Begin PBXSourcesBuildPhase section */
 		C448AF9F2E447AB1004CDA11 /* Sources */ = {

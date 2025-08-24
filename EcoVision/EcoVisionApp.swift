@@ -11,6 +11,9 @@ import UserNotifications
 @main
 struct EcoVisionApp: App {
     init() {
+        // App initialization
+
+        
         // Set up notification delegate
         UNUserNotificationCenter.current().delegate = NotificationManager.shared
         

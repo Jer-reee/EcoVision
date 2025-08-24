@@ -18,6 +18,7 @@ struct ContentView: View {
     @State private var sourceType: UIImagePickerController.SourceType = .camera
     @State private var selectedTab = 0 // 0: Home, 1: Calendar, 2: Map, 3: Profile
     @State private var showingMapDetail = false
+    @State private var selectedLocation: Location?
     @State private var showingAIResult = false
     @State private var showingNoBinResult = false
     @State private var showingManualSearch = false
@@ -61,9 +62,22 @@ struct ContentView: View {
                         )
                     case 2:
                         if showingMapDetail {
-                            MapDetailView(showingMapDetail: $showingMapDetail)
+                            MapDetailView(showingMapDetail: $showingMapDetail, location: selectedLocation ?? Location(
+                                name: "CDS Vic Alfred Square",
+                                address: "Shop 1/61 Curtis St, Ballarat Central VIC 3350",
+                                latitude: -37.5622,
+                                longitude: 143.8503,
+                                type: .containerDeposit,
+                                openingHours: "8:00am-7:00pm Daily",
+                                website: "https://cdsvic.com.au",
+                                acceptedItems: [
+                                    "Most aluminium, glass, plastic and liquid paperboard (carton) drink containers between 150mL and 3 litres",
+                                    "You can keep the lids on, we recycle them too!",
+                                    "Look for the 10c mark on the drink container label"
+                                ]
+                            ))
                         } else {
-                            MapView(showingMapDetail: $showingMapDetail)
+                            MapView(showingMapDetail: $showingMapDetail, selectedLocation: $selectedLocation)
                         }
                     case 3:
                         ProfileView(
