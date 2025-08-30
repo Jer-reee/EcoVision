@@ -9,6 +9,7 @@ import SwiftUI
 import PhotosUI
 import AVFoundation
 import Foundation
+import GooglePlaces
 
 struct ContentView: View {
     @State private var showingImagePicker = false
@@ -137,6 +138,9 @@ struct ContentView: View {
             }
             .background(Color.brandWhite)
             .navigationBarHidden(true)
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
+                // App going to background - this is handled by the individual services
+            }
             .actionSheet(isPresented: $showingActionSheet) {
                 ActionSheet(
                     title: Text("Select Image Source"),

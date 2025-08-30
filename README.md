@@ -47,6 +47,8 @@ EcoVision/
 │   ├── HomeView.swift              # Camera and image picker interface
 │   ├── MapView.swift               # Google Maps integration
 │   ├── GoogleMapsConfig.swift      # Google Maps configuration
+│   ├── GooglePlacesService.swift   # Google Places API service
+│   ├── AddressSearchView.swift     # Address search UI component
 │   ├── CalendarView.swift          # Waste collection calendar
 │   ├── ProfileView.swift           # User profile and settings
 │   ├── ResultViews.swift           # AI recognition results
@@ -78,6 +80,15 @@ EcoVision/
 - **Location Details**: Tap markers to view location information
 - **Directions**: Get directions to recycling locations via Google Maps
 - **Custom Map Styling**: Eco-friendly map appearance
+
+## Address Search Features
+
+- **Google Places Autocomplete**: Smart address search powered by Google Places API
+- **Real-time Suggestions**: Get address suggestions as you type (minimum 3 characters)
+- **Location Bias**: Results prioritized for Melbourne, Australia area
+- **Waste Collection Integration**: Automatically fetch collection data for selected addresses
+- **User-friendly Interface**: Clean dropdown with address details and clear button
+- **Error Handling**: Graceful handling of network issues and API errors
 
 ## Location Types
 

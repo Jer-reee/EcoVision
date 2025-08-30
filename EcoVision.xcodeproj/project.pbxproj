@@ -10,8 +10,7 @@
 		0572A7E1ACB6DA1D9570D09E /* Pods_EcoVisionTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 366CDE372BACA26FB5C8BB64 /* Pods_EcoVisionTests.framework */; };
 		824E989AB9F4A367C2556C29 /* Pods_EcoVision.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 672F0C76EB2C078CE30B22F4 /* Pods_EcoVision.framework */; };
 		C1953FF65ABC423BBDA277CD /* Pods_EcoVision_EcoVisionUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 442839D6AB42CFC39A87D015 /* Pods_EcoVision_EcoVisionUITests.framework */; };
-		9CE7D7CA967643AB8BFF83516F2CF132 /* GoogleMaps.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 82727A8B08DA4570B6E7C7BFB4E94026 /* GoogleMaps.bundle */; };
-		/* End PBXBuildFile section */
+/* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
 		C448AFB12E447AB3004CDA11 /* PBXContainerItemProxy */ = {
@@ -43,8 +42,7 @@
 		C448AFA32E447AB1004CDA11 /* EcoVision.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EcoVision.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C448AFB02E447AB3004CDA11 /* EcoVisionTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EcoVisionTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C448AFBA2E447AB3004CDA11 /* EcoVisionUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EcoVisionUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		82727A8B08DA4570B6E7C7BFB4E94026 /* GoogleMaps.bundle */ = {isa = PBXFileReference; lastKnownFileType = wrapper.cfbundle; name = GoogleMaps.bundle; path = EcoVision/GoogleMaps.bundle; sourceTree = SOURCE_ROOT; };
-		/* End PBXFileReference section */
+/* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		C448AFA52E447AB1004CDA11 /* EcoVision */ = {
