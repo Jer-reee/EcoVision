@@ -1,11 +1,11 @@
 # EcoVision - iOS Recycling App
 
-A SwiftUI-based iOS application that helps users identify recyclable items and find nearby recycling locations using Apple Maps integration (with Google Maps coming via Swift Package Manager).
+A SwiftUI-based iOS application that helps users identify recyclable items and find nearby recycling locations using Google Maps integration via CocoaPods.
 
 ## Features
 
 - **AI-Powered Item Recognition**: Identify recyclable items using camera or photo library
-- **Interactive Apple Maps**: View recycling locations on an interactive map
+- **Interactive Google Maps**: View recycling locations on an interactive Google Maps interface
 - **Location Filtering**: Filter locations by type (Container Deposit, Glass, E-Waste)
 - **Detailed Location Information**: View opening hours, accepted items, and get directions
 - **Waste Collection Calendar**: Track upcoming waste collection dates
@@ -13,15 +13,9 @@ A SwiftUI-based iOS application that helps users identify recyclable items and f
 
 ## Maps Integration
 
-This app currently uses Apple Maps for location display and will be upgraded to Google Maps via Swift Package Manager.
+This app uses Google Maps for location display and interaction via CocoaPods integration.
 
-### Current Status
-
-- ✅ **Apple Maps Integration**: Fully functional with custom markers
-- 🔄 **Google Maps Integration**: Coming soon via Swift Package Manager
-- ✅ **Location Data**: Sample recycling locations included
-
-### Future Google Maps Setup (Coming Soon)
+### Setup
 
 1. **Get a Google Maps API Key**:
    - Go to [Google Cloud Console](https://console.cloud.google.com/)
@@ -33,7 +27,15 @@ This app currently uses Apple Maps for location display and will be upgraded to 
 
 2. **Configure the API Key**:
    - Open `EcoVision/GoogleMapsConfig.swift`
-   - Replace the placeholder with your actual API key
+   - Replace `YOUR_GOOGLE_MAPS_API_KEY_HERE` with your actual API key
+
+3. **Install Dependencies**:
+   ```bash
+   pod install
+   ```
+
+4. **Open Workspace**:
+   - Open `EcoVision.xcworkspace` (not .xcodeproj) after running pod install
 
 ## Project Structure
 
@@ -43,8 +45,8 @@ EcoVision/
 │   ├── EcoVisionApp.swift          # Main app entry point
 │   ├── ContentView.swift           # Main navigation and tab structure
 │   ├── HomeView.swift              # Camera and image picker interface
-│   ├── MapView.swift               # Maps integration (Apple Maps + Google Maps coming)
-│   ├── GoogleMapsConfig.swift      # Google Maps configuration (for future use)
+│   ├── MapView.swift               # Google Maps integration
+│   ├── GoogleMapsConfig.swift      # Google Maps configuration
 │   ├── CalendarView.swift          # Waste collection calendar
 │   ├── ProfileView.swift           # User profile and settings
 │   ├── ResultViews.swift           # AI recognition results
@@ -71,11 +73,11 @@ EcoVision/
 
 ## Maps Features
 
-- **Interactive Map View**: Pan, zoom, and explore recycling locations
+- **Interactive Google Maps**: Pan, zoom, and explore recycling locations
 - **Custom Markers**: Color-coded markers for different recycling types
 - **Location Details**: Tap markers to view location information
-- **Directions**: Get directions to recycling locations
-- **Location Services**: Show user's current location
+- **Directions**: Get directions to recycling locations via Google Maps
+- **Custom Map Styling**: Eco-friendly map appearance
 
 ## Location Types
 
@@ -139,5 +141,6 @@ This project is for educational and demonstration purposes.
 ## Support
 
 For issues related to:
-- **Apple Maps**: Refer to [Apple Developer Documentation](https://developer.apple.com/documentation/mapkit)
+- **Google Maps**: Refer to [Google Maps iOS SDK Documentation](https://developers.google.com/maps/documentation/ios-sdk)
+- **CocoaPods**: Refer to [CocoaPods Documentation](https://cocoapods.org/)
 - **SwiftUI**: Refer to [Apple Developer Documentation](https://developer.apple.com/documentation/swiftui/)

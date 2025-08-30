@@ -12,6 +12,9 @@ import UserNotifications
 struct EcoVisionApp: App {
     init() {
         // App initialization
+        
+        // Initialize Google Maps
+        GoogleMapsConfig.initialize()
 
         
         // Set up notification delegate

@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import GoogleMaps
+import GooglePlaces
 
 struct GoogleMapsConfig {
     // MARK: - Configuration
@@ -20,9 +22,9 @@ struct GoogleMapsConfig {
     /// Initialize Google Maps services
     /// Call this method in your app's initialization
     static func initialize() {
-        // This will be called when we add Google Maps via SPM
-        // For now, we'll use a placeholder
-        print("Google Maps initialization - will be implemented with SPM")
+        GMSServices.provideAPIKey(apiKey)
+        GMSPlacesClient.provideAPIKey(apiKey)
+        print("Google Maps initialized successfully")
     }
     
     // MARK: - Default Map Configuration
@@ -61,6 +63,24 @@ struct GoogleMapsConfig {
         "stylers": [
           {
             "color": "#a2daf2"
+          }
+        ]
+      },
+      {
+        "featureType": "road",
+        "elementType": "geometry",
+        "stylers": [
+          {
+            "color": "#ffffff"
+          }
+        ]
+      },
+      {
+        "featureType": "poi.business",
+        "elementType": "geometry",
+        "stylers": [
+          {
+            "color": "#e8f4d9"
           }
         ]
       }

@@ -6,11 +6,12 @@
 //
 
 import SwiftUI
-import MapKit
+import GoogleMaps
+import GooglePlaces
 
 // MARK: - Location Model
 
-struct Location: Identifiable {
+struct Location: Identifiable, Equatable {
     let id = UUID()
     let name: String
     let address: String
@@ -20,6 +21,10 @@ struct Location: Identifiable {
     let openingHours: String
     let website: String?
     let acceptedItems: [String]
+    
+    static func == (lhs: Location, rhs: Location) -> Bool {
+        return lhs.id == rhs.id
+    }
 }
 
 enum LocationType {
@@ -30,14 +35,115 @@ enum LocationType {
 
 // MARK: - Helper Functions
 
-func markerColor(for type: LocationType) -> Color {
+func markerColor(for type: LocationType) -> UIColor {
     switch type {
     case .containerDeposit:
-        return .blue
+        return UIColor.systemBlue
     case .glass:
-        return .green
+        return UIColor.systemGreen
     case .ewaste:
-        return .orange
+        return UIColor.systemOrange
+    }
+}
+
+// MARK: - Google Maps View
+
+struct GoogleMapView: UIViewRepresentable {
+    @Binding var selectedLocation: Location?
+    let locations: [Location]
+    
+    func makeUIView(context: Context) -> GMSMapView {
+        let camera = GMSCameraPosition.camera(
+            withLatitude: GoogleMapsConfig.defaultLatitude,
+            longitude: GoogleMapsConfig.defaultLongitude,
+            zoom: GoogleMapsConfig.defaultZoom
+        )
+        
+        let mapView = GMSMapView()
+        mapView.camera = camera
+        mapView.delegate = context.coordinator
+        
+        // Apply custom map style
+        do {
+            if let styleURL = Bundle.main.url(forResource: "map_style", withExtension: "json") {
+                mapView.mapStyle = try GMSMapStyle(contentsOfFileURL: styleURL)
+            } else {
+                // Fallback to inline style
+                mapView.mapStyle = try GMSMapStyle(jsonString: GoogleMapsConfig.mapStyleJSON)
+            }
+        } catch {
+            print("Error applying map style: \(error)")
+        }
+        
+        // Add markers
+        for location in locations {
+            let marker = GMSMarker()
+            marker.position = CLLocationCoordinate2D(
+                latitude: location.latitude,
+                longitude: location.longitude
+            )
+            marker.title = location.name
+            marker.snippet = location.address
+            marker.icon = createCustomMarker(for: location.type)
+            marker.userData = location
+            marker.map = mapView
+        }
+        
+        return mapView
+    }
+    
+    func updateUIView(_ mapView: GMSMapView, context: Context) {
+        // Update markers if locations change
+        mapView.clear()
+        
+        for location in locations {
+            let marker = GMSMarker()
+            marker.position = CLLocationCoordinate2D(
+                latitude: location.latitude,
+                longitude: location.longitude
+            )
+            marker.title = location.name
+            marker.snippet = location.address
+            marker.icon = createCustomMarker(for: location.type)
+            marker.userData = location
+            marker.map = mapView
+        }
+    }
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    
+    private func createCustomMarker(for type: LocationType) -> UIImage {
+        let size: CGFloat = 30
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: size, height: size))
+        
+        return renderer.image { context in
+            let rect = CGRect(x: 0, y: 0, width: size, height: size)
+            let path = UIBezierPath(ovalIn: rect)
+            markerColor(for: type).setFill()
+            path.fill()
+            
+            // Add white border
+            UIColor.white.setStroke()
+            path.lineWidth = 2
+            path.stroke()
+        }
+    }
+    
+    class Coordinator: NSObject, GMSMapViewDelegate {
+        var parent: GoogleMapView
+        
+        init(_ parent: GoogleMapView) {
+            self.parent = parent
+        }
+        
+        func mapView(_ mapView: GMSMapView, didTap marker: GMSMarker) -> Bool {
+            if let location = marker.userData as? Location {
+                parent.selectedLocation = location
+            }
+            return true
+        }
     }
 }
 
@@ -117,50 +223,41 @@ struct MapView: View {
                 .padding(.top, 20)
                 .padding(.bottom, 20)
             
-            // Map Area (Apple Maps)
-            Map {
-                ForEach(filteredLocations) { location in
-                    Annotation(location.name, coordinate: CLLocationCoordinate2D(
-                        latitude: location.latitude,
-                        longitude: location.longitude
-                    )) {
-                        // Custom marker based on type
-                        Circle()
-                            .fill(markerColor(for: location.type))
-                            .frame(width: 20, height: 20)
-                            .overlay(
-                                Circle()
-                                    .stroke(Color.white, lineWidth: 2)
-                            )
-                            .onTapGesture {
-                                selectedLocation = location
-                            }
+            // Google Maps Area
+            GoogleMapView(selectedLocation: $selectedLocation, locations: filteredLocations)
+                .frame(height: 250)
+                .padding(.horizontal, 20)
+                .onChange(of: selectedLocation) { oldValue, newValue in
+                    if newValue != nil {
+                        showingMapDetail = true
                     }
                 }
-            }
-            .mapStyle(.standard)
-            .frame(height: 250)
-            .padding(.horizontal, 20)
             
             // Filter Tabs
             HStack(spacing: 0) {
                 FilterTabButton(
                     title: "Container Deposit Scheme",
-                    isSelected: selectedFilter == 0
+                    isSelected: selectedFilter == 0,
+                    isFirst: true,
+                    isLast: false
                 ) {
                     selectedFilter = 0
                 }
                 
                 FilterTabButton(
                     title: "Glass",
-                    isSelected: selectedFilter == 1
+                    isSelected: selectedFilter == 1,
+                    isFirst: false,
+                    isLast: false
                 ) {
                     selectedFilter = 1
                 }
                 
                 FilterTabButton(
                     title: "E-Waste",
-                    isSelected: selectedFilter == 2
+                    isSelected: selectedFilter == 2,
+                    isFirst: false,
+                    isLast: true
                 ) {
                     selectedFilter = 2
                 }
@@ -217,13 +314,13 @@ struct MapView: View {
             // View appeared
         }
     }
-    
-
 }
 
 struct FilterTabButton: View {
     let title: String
     let isSelected: Bool
+    let isFirst: Bool
+    let isLast: Bool
     let action: () -> Void
     
     var body: some View {
@@ -232,13 +329,19 @@ struct FilterTabButton: View {
                 .font(.caption)
                 .fontWeight(.medium)
                 .foregroundColor(isSelected ? Color.brandWhite : Color.brandVeryDarkBlue)
-                .padding(.horizontal, 12)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .padding(.horizontal, 8)
                 .padding(.vertical, 8)
+                .frame(maxWidth: .infinity, minHeight: 50)
                 .background(isSelected ? Color.brandSkyBlue : Color.clear)
-                .cornerRadius(15)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 15)
+                    Rectangle()
                         .stroke(Color.brandSkyBlue, lineWidth: 1)
+                )
+                .clipShape(
+                    Rectangle()
+                        .inset(by: 0)
                 )
         }
         .buttonStyle(PlainButtonStyle())
@@ -281,24 +384,10 @@ struct MapDetailView: View {
             .padding(.top, 20)
             .padding(.bottom, 20)
             
-            // Map Area (Apple Maps)
-            Map {
-                Annotation(location.name, coordinate: CLLocationCoordinate2D(
-                    latitude: location.latitude,
-                    longitude: location.longitude
-                )) {
-                    Circle()
-                        .fill(markerColor(for: location.type))
-                        .frame(width: 20, height: 20)
-                        .overlay(
-                            Circle()
-                                .stroke(Color.white, lineWidth: 2)
-                        )
-                }
-            }
-            .mapStyle(.standard)
-            .frame(height: 200)
-            .padding(.horizontal, 20)
+            // Google Maps Area for Detail View
+            GoogleMapView(selectedLocation: .constant(nil), locations: [location])
+                .frame(height: 200)
+                .padding(.horizontal, 20)
             
             Spacer()
             
@@ -340,9 +429,9 @@ struct MapDetailView: View {
                             }
                             
                             Button(action: {
-                                // Open in Apple Maps
+                                // Open in Google Maps
                                 let address = location.address.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-                                if let url = URL(string: "http://maps.apple.com/?address=\(address)") {
+                                if let url = URL(string: "https://maps.google.com/?q=\(address)") {
                                     UIApplication.shared.open(url)
                                 }
                             }) {
