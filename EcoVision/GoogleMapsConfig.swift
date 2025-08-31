@@ -29,10 +29,10 @@ struct GoogleMapsConfig {
     
     // MARK: - Default Map Configuration
     
-    /// Default camera position (Melbourne, Australia)
-    static let defaultLatitude = -37.8136
-    static let defaultLongitude = 144.9631
-    static let defaultZoom: Float = 10.0
+    /// Default camera position (Ballarat, Victoria, Australia)
+    static let defaultLatitude = -37.5622
+    static let defaultLongitude = 143.8503
+    static let defaultZoom: Float = 11.0
     
     // MARK: - Custom Map Style (Optional)
     

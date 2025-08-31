@@ -109,7 +109,7 @@ struct CalendarView: View {
                     Spacer()
                     
                     Rectangle()
-                        .fill(.yellow)
+                        .fill(Color(red: 1.0, green: 0.859, blue: 0.345))
                         .frame(width: 20, height: 12)
                     Text("Mixed Recycling")
                         .font(.caption)
@@ -120,7 +120,7 @@ struct CalendarView: View {
                     Rectangle()
                         .fill(.green)
                         .frame(width: 20, height: 12)
-                    Text("FOGO (Fortnightly)")
+                    Text("FOGO")
                         .font(.caption)
                         .foregroundColor(Color.brandVeryDarkBlue)
                     

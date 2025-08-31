@@ -38,11 +38,11 @@ enum LocationType {
 func markerColor(for type: LocationType) -> UIColor {
     switch type {
     case .containerDeposit:
-        return UIColor.systemBlue
+        return UIColor(Color.brandSkyBlue) // Use brand sky blue for CDS
     case .glass:
-        return UIColor.systemGreen
+        return UIColor.purple // Keep purple for glass
     case .ewaste:
-        return UIColor.systemOrange
+        return UIColor.green // Keep green for e-waste
     }
 }
 
@@ -75,8 +75,8 @@ struct GoogleMapView: UIViewRepresentable {
             print("Error applying map style: \(error)")
         }
         
-        // Add markers
-        for location in locations {
+        // Add markers with subtle entrance animation
+        for (index, location) in locations.enumerated() {
             let marker = GMSMarker()
             marker.position = CLLocationCoordinate2D(
                 latitude: location.latitude,
@@ -86,7 +86,16 @@ struct GoogleMapView: UIViewRepresentable {
             marker.snippet = location.address
             marker.icon = createCustomMarker(for: location.type)
             marker.userData = location
-            marker.map = mapView
+            
+            // Add marker with a slight delay for staggered appearance
+            DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 0.1) {
+                marker.map = mapView
+            }
+        }
+        
+        // Fit camera to show all locations if there are any
+        if !locations.isEmpty {
+            fitCameraToLocations(mapView: mapView, locations: locations)
         }
         
         return mapView
@@ -96,7 +105,8 @@ struct GoogleMapView: UIViewRepresentable {
         // Update markers if locations change
         mapView.clear()
         
-        for location in locations {
+        // Add new markers with subtle entrance animation
+        for (index, location) in locations.enumerated() {
             let marker = GMSMarker()
             marker.position = CLLocationCoordinate2D(
                 latitude: location.latitude,
@@ -106,7 +116,57 @@ struct GoogleMapView: UIViewRepresentable {
             marker.snippet = location.address
             marker.icon = createCustomMarker(for: location.type)
             marker.userData = location
-            marker.map = mapView
+            
+            // Add marker with a slight delay for staggered appearance
+            DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 0.1) {
+                marker.map = mapView
+            }
+        }
+        
+        // Fit camera to show all locations if there are any
+        if !locations.isEmpty {
+            fitCameraToLocations(mapView: mapView, locations: locations)
+        }
+    }
+    
+    private func fitCameraToLocations(mapView: GMSMapView, locations: [Location]) {
+        guard !locations.isEmpty else { return }
+        
+        if locations.count == 1 {
+            // For single location, center on it with a good zoom level
+            let location = locations[0]
+            let camera = GMSCameraPosition.camera(
+                withLatitude: location.latitude,
+                longitude: location.longitude,
+                zoom: 15.0  // Increased zoom for better detail view
+            )
+            
+            // Smooth animation with duration
+            CATransaction.begin()
+            CATransaction.setAnimationDuration(1.2)  // Longer animation for single location
+            CATransaction.setAnimationTimingFunction(CAMediaTimingFunction(name: .easeInEaseOut))
+            mapView.animate(to: camera)
+            CATransaction.commit()
+        } else {
+            // For multiple locations, create bounds to fit all
+            var bounds = GMSCoordinateBounds()
+            for location in locations {
+                let coordinate = CLLocationCoordinate2D(
+                    latitude: location.latitude,
+                    longitude: location.longitude
+                )
+                bounds = bounds.includingCoordinate(coordinate)
+            }
+            
+            // Add some padding around the bounds
+            let update = GMSCameraUpdate.fit(bounds, withPadding: 60.0)  // Increased padding
+            
+            // Smooth animation with duration
+            CATransaction.begin()
+            CATransaction.setAnimationDuration(0.8)  // Shorter animation for bounds fitting
+            CATransaction.setAnimationTimingFunction(CAMediaTimingFunction(name: .easeInEaseOut))
+            mapView.animate(with: update)
+            CATransaction.commit()
         }
     }
     
@@ -114,20 +174,15 @@ struct GoogleMapView: UIViewRepresentable {
         Coordinator(self)
     }
     
-    private func createCustomMarker(for type: LocationType) -> UIImage {
-        let size: CGFloat = 30
-        let renderer = UIGraphicsImageRenderer(size: CGSize(width: size, height: size))
-        
-        return renderer.image { context in
-            let rect = CGRect(x: 0, y: 0, width: size, height: size)
-            let path = UIBezierPath(ovalIn: rect)
-            markerColor(for: type).setFill()
-            path.fill()
-            
-            // Add white border
-            UIColor.white.setStroke()
-            path.lineWidth = 2
-            path.stroke()
+    private func createCustomMarker(for type: LocationType) -> UIImage? {
+        // Use Google Maps default colored marker icons
+        switch type {
+        case .ewaste:
+            return GMSMarker.markerImage(with: .green)
+        case .glass:
+            return GMSMarker.markerImage(with: .purple)
+        case .containerDeposit:
+            return GMSMarker.markerImage(with: .blue)
         }
     }
     
@@ -140,9 +195,39 @@ struct GoogleMapView: UIViewRepresentable {
         
         func mapView(_ mapView: GMSMapView, didTap marker: GMSMarker) -> Bool {
             if let location = marker.userData as? Location {
+                // Add pin bounce animation when tapped
+                animateMarkerBounce(marker: marker)
                 parent.selectedLocation = location
             }
             return true
+        }
+        
+        private func animateMarkerBounce(marker: GMSMarker) {
+            // Create a bouncing animation for the marker
+            let originalPosition = marker.position
+            
+            // Animate the marker slightly up and down for a bounce effect
+            CATransaction.begin()
+            CATransaction.setAnimationDuration(0.3)
+            CATransaction.setAnimationTimingFunction(CAMediaTimingFunction(name: .easeOut))
+            
+            // Move marker slightly north (up on map) for bounce effect
+            let bouncePosition = CLLocationCoordinate2D(
+                latitude: originalPosition.latitude + 0.0002,
+                longitude: originalPosition.longitude
+            )
+            marker.position = bouncePosition
+            
+            CATransaction.setCompletionBlock {
+                // Bounce back to original position
+                CATransaction.begin()
+                CATransaction.setAnimationDuration(0.2)
+                CATransaction.setAnimationTimingFunction(CAMediaTimingFunction(name: .easeIn))
+                marker.position = originalPosition
+                CATransaction.commit()
+            }
+            
+            CATransaction.commit()
         }
     }
 }
@@ -152,50 +237,152 @@ struct GoogleMapView: UIViewRepresentable {
 struct MapView: View {
     @Binding var showingMapDetail: Bool
     @Binding var selectedLocation: Location?
-    @State private var selectedFilter = 0 // 0: Container Deposit, 1: Glass, 2: E-Waste
+    @State private var selectedFilter = 0 // 0: E-Waste, 1: Glass
     
-    // Sample locations data
+    // Real Ballarat waste dropoff locations
     private let allLocations: [Location] = [
+        // E-Waste Locations
         Location(
-            name: "CDS Vic Alfred Square",
-            address: "Shop 1/61 Curtis St, Ballarat Central VIC 3350",
-            latitude: -37.5622,
-            longitude: 143.8503,
-            type: .containerDeposit,
-            openingHours: "8:00am-7:00pm Daily",
-            website: "https://cdsvic.com.au",
-            acceptedItems: [
-                "Most aluminium, glass, plastic and liquid paperboard (carton) drink containers between 150mL and 3 litres",
-                "You can keep the lids on, we recycle them too!",
-                "Look for the 10c mark on the drink container label"
-            ]
-        ),
-        Location(
-            name: "Glass Recycling Centre",
-            address: "123 Main St, Melbourne VIC 3000",
-            latitude: -37.8136,
-            longitude: 144.9631,
-            type: .glass,
-            openingHours: "9:00am-5:00pm Mon-Fri",
-            website: nil,
-            acceptedItems: [
-                "All types of glass bottles and jars",
-                "Clean glass only - no broken pieces"
-            ]
-        ),
-        Location(
-            name: "E-Waste Collection Point",
-            address: "456 Tech Ave, Sydney NSW 2000",
-            latitude: -33.8688,
-            longitude: 151.2093,
+            name: "Ballarat Transfer Station",
+            address: "119 Gillies Street South, Alfredton VIC 3350",
+            latitude: -37.566762,
+            longitude: 143.816442,
             type: .ewaste,
-            openingHours: "10:00am-4:00pm Tue-Sat",
-            website: "https://ewaste.com.au",
+            openingHours: "Mon-Fri: 8:00am-4:00pm; Sat-Sun: 10:00am-4:00pm",
+            website: "https://ballarat.vic.gov.au/property/waste-and-recycling/transfer-station",
             acceptedItems: [
-                "Computers, laptops, and tablets",
-                "Mobile phones and chargers",
-                "Televisions and monitors",
+                "Electronic waste and appliances",
+                "Computers, TVs, and mobile devices",
                 "Small household electronics"
+            ]
+        ),
+        Location(
+            name: "Garden Recycling Centre",
+            address: "154 Learmonth Street, Alfredton VIC 3350",
+            latitude: -37.567207,
+            longitude: 143.808512,
+            type: .ewaste,
+            openingHours: "Mon-Sat: 7:30am-4:30pm; Sun: Closed",
+            website: "https://gardenrecyclingcentre.com.au",
+            acceptedItems: [
+                "Electronic waste collection",
+                "Garden waste and organics",
+                "Recyclable materials"
+            ]
+        ),
+        Location(
+            name: "Officeworks Ballarat",
+            address: "118-122 Creswick Rd, Ballarat Central VIC 3350",
+            latitude: -37.554527,
+            longitude: 143.854601,
+            type: .ewaste,
+            openingHours: "Mon-Fri: 7:00am-7:00pm; Sat: 8:00am-6:00pm; Sun: 9:00am-6:00pm",
+            website: "https://www.officeworks.com.au/shop/officeworks/storepage/W364/VIC/Ballarat",
+            acceptedItems: [
+                "Computers and laptops",
+                "Printers and ink cartridges",
+                "Mobile phones and accessories",
+                "Small electronic devices"
+            ]
+        ),
+        
+        // Glass Recycling Locations
+        Location(
+            name: "Eastwood Street Shopping Centre",
+            address: "7/25 Eastwood Street, Ballarat Central VIC 3350",
+            latitude: -37.563391,
+            longitude: 143.8612,
+            type: .glass,
+            openingHours: "24/7 (street bin)",
+            website: "https://ballarat.vic.gov.au/glass-recycling",
+            acceptedItems: [
+                "Glass bottles and jars",
+                "Wine and beer bottles",
+                "Food containers (glass only)"
+            ]
+        ),
+        Location(
+            name: "Bradlys Lane",
+            address: "Bradlys Lane, Bakery Hill VIC 3350",
+            latitude: -37.5639932,
+            longitude: 143.866433,
+            type: .glass,
+            openingHours: "24/7 (street bin)",
+            website: "https://ballarat.vic.gov.au/glass-recycling",
+            acceptedItems: [
+                "Glass bottles and jars",
+                "All colors of glass accepted",
+                "Clean glass containers only"
+            ]
+        ),
+        Location(
+            name: "Midvale Shopping Centre",
+            address: "Shop 2, 1174 Geelong Road, Mount Clear VIC 3350",
+            latitude: -37.60459137,
+            longitude: 143.8668936,
+            type: .glass,
+            openingHours: "24/7 (shopping centre bin)",
+            website: "https://ballarat.vic.gov.au/glass-recycling",
+            acceptedItems: [
+                "Glass bottles and jars",
+                "Wine and spirit bottles",
+                "Food jars and containers"
+            ]
+        ),
+        Location(
+            name: "Buninyong Recreation Reserve",
+            address: "401 Cornish St, Buninyong VIC 3357",
+            latitude: -37.6489583,
+            longitude: 143.8901109,
+            type: .glass,
+            openingHours: "24/7 (park bin)",
+            website: "https://ballarat.vic.gov.au/glass-recycling",
+            acceptedItems: [
+                "Glass bottles and jars",
+                "Beverage containers",
+                "Food storage jars"
+            ]
+        ),
+        Location(
+            name: "Ballarat Greyhound Racing Club",
+            address: "605 Rubicon Street, Sebastopol VIC 3356",
+            latitude: -37.5853,
+            longitude: 143.8395,
+            type: .glass,
+            openingHours: "24/7 (club grounds bin)",
+            website: "https://ballarat.vic.gov.au/glass-recycling",
+            acceptedItems: [
+                "Glass bottles and jars",
+                "All glass beverage containers",
+                "Clean glass only"
+            ]
+        ),
+        Location(
+            name: "Miners Rest General Store",
+            address: "200 Howe St, Miners Rest VIC 3352",
+            latitude: -37.4836794,
+            longitude: 143.8025531,
+            type: .glass,
+            openingHours: "24/7 (store bin)",
+            website: "https://ballarat.vic.gov.au/glass-recycling",
+            acceptedItems: [
+                "Glass bottles and jars",
+                "Wine and beer bottles",
+                "Food containers"
+            ]
+        ),
+        Location(
+            name: "Stockland Wendouree Centre",
+            address: "330 Gillies Street North, Wendouree VIC 3355",
+            latitude: -37.532681,
+            longitude: 143.8238531,
+            type: .glass,
+            openingHours: "24/7 (shopping centre bin)",
+            website: "https://ballarat.vic.gov.au/glass-recycling",
+            acceptedItems: [
+                "Glass bottles and jars",
+                "Beverage containers",
+                "Food storage containers"
             ]
         )
     ]
@@ -203,13 +390,11 @@ struct MapView: View {
     private var filteredLocations: [Location] {
         switch selectedFilter {
         case 0:
-            return allLocations.filter { $0.type == .containerDeposit }
+            return allLocations.filter { $0.type == .ewaste }
         case 1:
             return allLocations.filter { $0.type == .glass }
-        case 2:
-            return allLocations.filter { $0.type == .ewaste }
         default:
-            return allLocations
+            return allLocations.filter { $0.type != .containerDeposit }
         }
     }
     
@@ -236,7 +421,7 @@ struct MapView: View {
             // Filter Tabs
             HStack(spacing: 0) {
                 FilterTabButton(
-                    title: "Container Deposit Scheme",
+                    title: "E-Waste",
                     isSelected: selectedFilter == 0,
                     isFirst: true,
                     isLast: false
@@ -253,23 +438,51 @@ struct MapView: View {
                     selectedFilter = 1
                 }
                 
-                FilterTabButton(
-                    title: "E-Waste",
-                    isSelected: selectedFilter == 2,
-                    isFirst: false,
-                    isLast: true
-                ) {
-                    selectedFilter = 2
+                // CDS Website Link Button
+                Button(action: {
+                    if let url = URL(string: "https://cdsvic.org.au/locations") {
+                        UIApplication.shared.open(url)
+                    }
+                }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "link")
+                            .font(.system(size: 12))
+                        Text("CDS")
+                            .font(.system(size: 12, weight: .medium))
+                    }
+                    .foregroundColor(Color.brandSkyBlue)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 36)
+                    .background(Color.brandSkyBlue.opacity(0.1))
+                    .overlay(
+                        Rectangle()
+                            .stroke(Color.brandSkyBlue.opacity(0.3), lineWidth: 1)
+                    )
                 }
             }
             .padding(.top, 20)
             .padding(.horizontal, 20)
             
+            // Location List Header
+            HStack {
+                Text("Locations (\(filteredLocations.count))")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(Color.brandVeryDarkBlue)
             Spacer()
+                if filteredLocations.count > 4 {
+                    Text("Scroll for more")
+                        .font(.system(size: 12))
+                        .foregroundColor(Color.brandMutedBlue)
+                        .opacity(0.8)
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 16)
+            .padding(.bottom, 8)
             
             // Location List
-            ScrollView {
-                VStack(spacing: 8) {
+            ScrollView(.vertical, showsIndicators: true) {
+                LazyVStack(spacing: 8) {
                     ForEach(filteredLocations) { location in
                         Button(action: {
                             selectedLocation = location
@@ -304,10 +517,13 @@ struct MapView: View {
                         }
                         .buttonStyle(PlainButtonStyle())
                     }
+                    
+                    // Bottom spacing for better scrolling experience
+                    Spacer(minLength: 20)
                 }
+                .padding(.bottom, 100) // Safe area padding
             }
             .padding(.horizontal, 20)
-            .padding(.bottom, 100)
         }
         .background(Color.brandWhite)
         .onAppear {
@@ -332,8 +548,8 @@ struct FilterTabButton: View {
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
                 .padding(.horizontal, 8)
-                .padding(.vertical, 8)
-                .frame(maxWidth: .infinity, minHeight: 50)
+                .padding(.vertical, 6)
+                .frame(maxWidth: .infinity, minHeight: 36)
                 .background(isSelected ? Color.brandSkyBlue : Color.clear)
                 .overlay(
                     Rectangle()
@@ -386,8 +602,8 @@ struct MapDetailView: View {
             
             // Google Maps Area for Detail View
             GoogleMapView(selectedLocation: .constant(nil), locations: [location])
-                .frame(height: 200)
-                .padding(.horizontal, 20)
+            .frame(height: 200)
+            .padding(.horizontal, 20)
             
             Spacer()
             

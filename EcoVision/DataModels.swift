@@ -75,7 +75,7 @@ extension WasteCollectionRecord {
             collections.append(WasteCollection(
                 type: "Mixed Recycling", 
                 date: nextrecycle,
-                color: .yellow,
+                color: Color(red: 1.0, green: 0.859, blue: 0.345),
                 frequency: .fortnightly
             ))
         }
