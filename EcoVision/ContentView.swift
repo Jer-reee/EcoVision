@@ -9,6 +9,7 @@ import SwiftUI
 import PhotosUI
 import AVFoundation
 import Foundation
+import GooglePlaces
 
 struct ContentView: View {
     @State private var showingImagePicker = false
@@ -25,28 +26,37 @@ struct ContentView: View {
     @State private var showingReportError = false
     @State private var userAddress = "807 Freehold Place" // Default address for demo
     @StateObject private var wasteService = WasteCollectionService()
+    @StateObject private var aiService = AIService()
+    @State private var aiClassificationResult: AIService.WasteClassificationResult?
+    @State private var showingAILoading = false
     
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
                 // Main Content Area
-                if showingAIResult {
+                if showingAIResult, let result = aiClassificationResult {
                     AIResultView(
-                        itemName: "Cardboard",
-                        binType: "Mixed Recycling",
-                        binColor: .yellow,
-                        binImageName: "Yellow Bin",
+                        aiResult: result,
+                        selectedImage: selectedImage,
                         showingResult: $showingAIResult,
                         showingReportError: $showingReportError
                     )
                 } else if showingNoBinResult {
                     NoBinResultView(
+                        selectedImage: selectedImage,
                         showingResult: $showingNoBinResult,
                         showingReportError: $showingReportError
                     )
                 } else if showingManualSearch {
                     ManualSearchView(
+                        selectedImage: selectedImage,
                         showingSearch: $showingManualSearch,
+                        showingReportError: $showingReportError
+                    )
+                } else if showingAILoading {
+                    AILoadingView(
+                        selectedImage: selectedImage,
+                        showingLoading: $showingAILoading,
                         showingReportError: $showingReportError
                     )
                 } else if showingReportError {
@@ -90,7 +100,7 @@ struct ContentView: View {
                 }
                 
                 // Bottom Navigation Bar (hidden when showing result views)
-                if !showingAIResult && !showingNoBinResult && !showingManualSearch && !showingReportError {
+                if !showingAIResult && !showingNoBinResult && !showingManualSearch && !showingReportError && !showingAILoading {
                     HStack(spacing: 0) {
                         NavigationTabView(
                             icon: "Tab Home",
@@ -137,6 +147,9 @@ struct ContentView: View {
             }
             .background(Color.brandWhite)
             .navigationBarHidden(true)
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
+                // App going to background - this is handled by the individual services
+            }
             .actionSheet(isPresented: $showingActionSheet) {
                 ActionSheet(
                     title: Text("Select Image Source"),
@@ -159,29 +172,73 @@ struct ContentView: View {
             }
             .onChange(of: selectedImage) { oldValue, newImage in
                 if let image = newImage {
-                    // Simulate AI processing and show different results for demo
-                    // In real implementation, this would call your AI model
-                    
-                    // For demo: randomly show different result types
-                    let randomResult = Int.random(in: 0...3)
-                    
-                    switch randomResult {
-                    case 0:
-                        // Show successful AI recognition
-                        showingAIResult = true
-                    case 1:
-                        // Show item that can't go in bins
-                        showingNoBinResult = true
-                    case 2:
-                        // Show manual search (failed recognition)
-                        showingManualSearch = true
-                    default:
-                        // Show AI result by default
-                        showingAIResult = true
+                    Task {
+                        await processImageWithAI(image)
                     }
-                    
-                    print("Image selected: \(image)")
                 }
+            }
+        }
+    }
+    
+    // MARK: - AI Image Processing
+    
+    private func processImageWithAI(_ image: UIImage) async {
+        print("📷 IMAGE ANALYSIS STARTED:")
+        print("🖼️ Image size: \(image.size)")
+        print("⏳ Processing...")
+        
+        await MainActor.run {
+            showingAILoading = true
+        }
+        
+        // Use real AI analysis
+        print("🚀 Using AI analysis")
+        if let result = await aiService.analyzeWasteImage(image) {
+            // Print AI results
+            print("🤖 AI CLASSIFICATION RESULTS:")
+            print("📦 Item Name: \(result.itemName)")
+            print("🗑️ Bin Type: \(result.binType.rawValue)")
+            print("🎨 Bin Color: \(result.binColor)")
+            print("📝 Description: \(result.description)")
+            print("📋 Instructions: \(result.instructions)")
+            print("📊 Confidence: \(String(format: "%.2f", result.confidence * 100))%")
+            print("🔧 Special Collection: \(result.isSpecialCollection)")
+            if let specialType = result.specialCollectionType {
+                print("📦 Special Collection Type: \(specialType)")
+            }
+
+            print("----------------------------------------")
+            
+            await handleAIResult(result)
+        } else {
+            print("❌ AI IMAGE ANALYSIS FAILED - Falling back to manual search")
+            await MainActor.run {
+                showingAILoading = false
+                showingManualSearch = true
+            }
+        }
+    }
+    
+    private func handleAIResult(_ result: AIService.WasteClassificationResult) async {
+        print("🎯 ROUTING AI RESULT:")
+        print("📦 Item: \(result.itemName)")
+        print("🗑️ Bin Type: \(result.binType.rawValue)")
+        print("🔄 Routing to: ", terminator: "")
+        
+        await MainActor.run {
+            showingAILoading = false
+            aiClassificationResult = result
+            
+            switch result.binType {
+            case .none:
+                print("No Bin Result View")
+                showingNoBinResult = true
+            case .yellow, .red, .green, .purple:
+                print("AI Result View (Regular Bin)")
+                showingAIResult = true
+            case .special:
+                print("AI Result View (Special Collection)")
+                showingAIResult = true
             }
         }
     }

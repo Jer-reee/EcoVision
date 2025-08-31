@@ -36,15 +36,12 @@ struct ProfileView: View {
                         .fontWeight(.medium)
                         .foregroundColor(Color.brandVeryDarkBlue)
                     
-                    TextField("Start typing...", text: $address)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .font(.system(size: 14))
-                        .onChange(of: address) { oldValue, newAddress in
-                            // Fetch collection data when address changes
-                            if !newAddress.isEmpty && newAddress != "Start typing..." {
-                                wasteService.fetchWasteCollection(for: newAddress)
-                            }
+                    AddressSearchView(selectedAddress: $address) { selectedAddress in
+                        // Fetch collection data when address is selected
+                        if !selectedAddress.isEmpty {
+                            wasteService.fetchWasteCollection(for: selectedAddress)
                         }
+                    }
                 }
                 
                 // Notifications Section

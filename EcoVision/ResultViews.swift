@@ -10,10 +10,8 @@ import SwiftUI
 // MARK: - AI Recognition Result View
 
 struct AIResultView: View {
-    let itemName: String
-    let binType: String
-    let binColor: Color
-    let binImageName: String
+    let aiResult: AIService.WasteClassificationResult
+    let selectedImage: UIImage?
     @Binding var showingResult: Bool
     @Binding var showingReportError: Bool
     
@@ -38,46 +36,71 @@ struct AIResultView: View {
             .padding(.top, 20)
             .padding(.bottom, 30)
             
-            // Captured Image Placeholder
-            Rectangle()
-                .fill(Color.gray.opacity(0.3))
-                .frame(height: 200)
-                .overlay(
-                    Image(systemName: "photo")
-                        .font(.system(size: 40))
-                        .foregroundColor(.gray)
-                )
-                .cornerRadius(12)
-                .padding(.horizontal, 20)
+            // Captured Image Display
+            if let image = selectedImage {
+                Image(uiImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(height: 200)
+                    .clipped()
+                    .cornerRadius(12)
+                    .padding(.horizontal, 20)
+            } else {
+                Rectangle()
+                    .fill(Color.gray.opacity(0.3))
+                    .frame(height: 200)
+                    .overlay(
+                        Image(systemName: "photo")
+                            .font(.system(size: 40))
+                            .foregroundColor(.gray)
+                    )
+                    .cornerRadius(12)
+                    .padding(.horizontal, 20)
+            }
             
             Spacer()
             
             // Item Identification
             VStack(spacing: 16) {
-                Text(itemName)
+                Text(aiResult.itemName)
                     .font(.title2)
                     .fontWeight(.bold)
                     .foregroundColor(Color.brandVeryDarkBlue)
                 
                 // Bin Recommendation
                 HStack(spacing: 16) {
-                    Image(binImageName)
+                    Image(aiResult.binImageName)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 60, height: 60)
-                        .foregroundColor(binColor)
+                        .foregroundColor(Color(aiResult.binColor.lowercased()))
                     
-                    Text(binType)
-                        .font(.title3)
-                        .fontWeight(.medium)
-                        .foregroundColor(binColor)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(aiResult.binType.rawValue)
+                            .font(.title3)
+                            .fontWeight(.medium)
+                            .foregroundColor(Color(aiResult.binColor.lowercased()))
+                        
+                        if aiResult.confidence < 0.8 {
+                            Text("Low confidence")
+                                .font(.caption)
+                                .foregroundColor(.orange)
+                        }
+                    }
                 }
                 
-                Text("Cardboard can be recycled into new cardboards.\nPlease place in the yellow bin.")
+                Text(aiResult.description)
                     .font(.system(size: 14))
                     .foregroundColor(Color.brandVeryDarkBlue)
                     .multilineTextAlignment(.center)
                     .lineLimit(nil)
+                
+                Text(aiResult.instructions)
+                    .font(.system(size: 14))
+                    .foregroundColor(Color.brandVeryDarkBlue)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(nil)
+                    .padding(.top, 8)
                 
                 // Report Error Button
                 Button(action: {
@@ -106,6 +129,7 @@ struct AIResultView: View {
 // MARK: - No Bin Result View
 
 struct NoBinResultView: View {
+    let selectedImage: UIImage?
     @Binding var showingResult: Bool
     @Binding var showingReportError: Bool
     
@@ -130,17 +154,27 @@ struct NoBinResultView: View {
             .padding(.top, 20)
             .padding(.bottom, 30)
             
-            // Captured Image Placeholder
-            Rectangle()
-                .fill(Color.gray.opacity(0.3))
-                .frame(height: 200)
-                .overlay(
-                    Image(systemName: "photo")
-                        .font(.system(size: 40))
-                        .foregroundColor(.gray)
-                )
-                .cornerRadius(12)
-                .padding(.horizontal, 20)
+            // Captured Image Display
+            if let image = selectedImage {
+                Image(uiImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(height: 200)
+                    .clipped()
+                    .cornerRadius(12)
+                    .padding(.horizontal, 20)
+            } else {
+                Rectangle()
+                    .fill(Color.gray.opacity(0.3))
+                    .frame(height: 200)
+                    .overlay(
+                        Image(systemName: "photo")
+                            .font(.system(size: 40))
+                            .foregroundColor(.gray)
+                    )
+                    .cornerRadius(12)
+                    .padding(.horizontal, 20)
+            }
             
             Spacer()
             
@@ -260,49 +294,104 @@ struct NoBinResultView: View {
 // MARK: - Manual Search View
 
 struct ManualSearchView: View {
+    let selectedImage: UIImage?
     @State private var searchText = ""
+    @State private var isSearching = false
+    @State private var searchResult: AIService.WasteClassificationResult?
+    @State private var showingSearchResult = false
+    @State private var errorMessage: String?
     @Binding var showingSearch: Bool
     @Binding var showingReportError: Bool
+    @StateObject private var aiService = AIService()
     
     var body: some View {
         VStack(spacing: 0) {
-            // Header with back button
-            HStack {
-                Button(action: {
-                    showingSearch = false
-                }) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "chevron.left")
-                        Text("Back")
-                    }
-                    .foregroundColor(Color.brandSkyBlue)
-                    .font(.system(size: 16))
-                }
-                
-                Spacer()
+            // Captured Image Display
+            if let image = selectedImage {
+                Image(uiImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(height: 200)
+                    .clipped()
+                    .cornerRadius(12)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
+            } else {
+                Rectangle()
+                    .fill(Color.gray.opacity(0.3))
+                    .frame(height: 200)
+                    .overlay(
+                        Image(systemName: "photo")
+                            .font(.system(size: 40))
+                            .foregroundColor(.gray)
+                    )
+                    .cornerRadius(12)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
             }
-            .padding(.horizontal, 20)
-            .padding(.top, 20)
-            .padding(.bottom, 30)
             
-            // Error Message
+            Spacer()
+            
+            // Manual Search Interface
             VStack(spacing: 16) {
-                Text("Sorry, object not identified")
+                Text("Manual Search")
                     .font(.title2)
                     .fontWeight(.bold)
                     .foregroundColor(Color.brandVeryDarkBlue)
                 
-                Text("We are unable to identify the item.\nPlease take another photo or manually search for the item")
+                Text("Enter the name of the item you want to recycle")
                     .font(.system(size: 14))
                     .foregroundColor(Color.brandVeryDarkBlue)
                     .multilineTextAlignment(.center)
                     .lineLimit(nil)
                 
                 // Search Field
-                TextField("Search for item...", text: $searchText)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .font(.system(size: 16))
-                    .padding(.top, 20)
+                HStack(spacing: 12) {
+                    TextField("e.g., cardboard box, plastic bottle...", text: $searchText)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .font(.system(size: 16))
+                        .disabled(isSearching)
+                    
+                    // Search Button
+                    Button(action: {
+                        Task {
+                            await performTextSearch()
+                        }
+                    }) {
+                        HStack(spacing: 6) {
+                            if isSearching {
+                                ProgressView()
+                                    .scaleEffect(0.8)
+                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            } else {
+                                Image(systemName: "magnifyingglass")
+                                    .font(.system(size: 14, weight: .medium))
+                            }
+                            Text(isSearching ? "Searching..." : "Search")
+                                .font(.system(size: 14, weight: .medium))
+                        }
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 10)
+                        .background(
+                            searchText.isEmpty || isSearching 
+                                ? Color.gray 
+                                : Color.brandSkyBlue
+                        )
+                        .cornerRadius(8)
+                    }
+                    .disabled(searchText.isEmpty || isSearching)
+                }
+                .padding(.top, 20)
+                
+                // Error Message
+                if let errorMessage = errorMessage {
+                    Text(errorMessage)
+                        .font(.system(size: 12))
+                        .foregroundColor(.red)
+                        .multilineTextAlignment(.center)
+                        .padding(.top, 8)
+                }
                 
                 // Report Error Button
                 Button(action: {
@@ -324,8 +413,85 @@ struct ManualSearchView: View {
             .padding(.horizontal, 20)
             
             Spacer()
+            
+            // Back Button at bottom for better accessibility
+            Button(action: {
+                showingSearch = false
+            }) {
+                HStack(spacing: 8) {
+                    Image(systemName: "chevron.left")
+                    Text("Back")
+                }
+                .foregroundColor(Color.brandSkyBlue)
+                .font(.system(size: 16, weight: .medium))
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+                .background(Color.brandSkyBlue.opacity(0.1))
+                .cornerRadius(8)
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 20)
         }
         .background(Color.brandWhite)
+        .sheet(isPresented: $showingSearchResult) {
+            if let result = searchResult {
+                AIResultView(
+                    aiResult: result,
+                    selectedImage: selectedImage,
+                    showingResult: $showingSearchResult,
+                    showingReportError: $showingReportError
+                )
+            }
+        }
+    }
+    
+    // MARK: - Search Methods
+    
+    private func performTextSearch() async {
+        guard !searchText.isEmpty else { return }
+        
+        await MainActor.run {
+            isSearching = true
+            errorMessage = nil
+        }
+        
+            print("🔍 MANUAL SEARCH STARTED:")
+        print("📝 Search Text: \(searchText)")
+        print("⏳ Processing...")
+        
+        // Use real AI analysis
+        print("🚀 Using AI analysis")
+        do {
+            let result = try await aiService.analyzeWasteText(searchText)
+            
+            // Print AI results
+            print("🤖 AI CLASSIFICATION RESULTS:")
+            print("📦 Item Name: \(result.itemName)")
+            print("🗑️ Bin Type: \(result.binType.rawValue)")
+            print("🎨 Bin Color: \(result.binColor)")
+            print("📝 Description: \(result.description)")
+            print("📋 Instructions: \(result.instructions)")
+            print("📊 Confidence: \(String(format: "%.2f", result.confidence * 100))%")
+            print("🔧 Special Collection: \(result.isSpecialCollection)")
+            if let specialType = result.specialCollectionType {
+                print("📦 Special Collection Type: \(specialType)")
+            }
+
+            print("----------------------------------------")
+            
+            await MainActor.run {
+                isSearching = false
+                searchResult = result
+                showingSearchResult = true
+            }
+        } catch {
+            print("❌ AI SEARCH ERROR: \(error.localizedDescription)")
+            await MainActor.run {
+                isSearching = false
+                errorMessage = "Search failed: \(error.localizedDescription)"
+            }
+        }
+        
     }
 }
 
@@ -338,24 +504,6 @@ struct ReportErrorView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Header with back button
-            HStack {
-                Button(action: {
-                    showingReport = false
-                }) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "chevron.left")
-                        Text("Back")
-                    }
-                    .foregroundColor(Color.brandSkyBlue)
-                    .font(.system(size: 16))
-                }
-                
-                Spacer()
-            }
-            .padding(.horizontal, 20)
-            .padding(.top, 20)
-            .padding(.bottom, 30)
             
             VStack(alignment: .leading, spacing: 24) {
                 Text("Seen an Error/Issue?")
@@ -410,7 +558,25 @@ struct ReportErrorView: View {
                     .cornerRadius(8)
             }
             .padding(.horizontal, 20)
-            .padding(.bottom, 120)
+            .padding(.bottom, 80)
+            
+            // Back Button at bottom for better accessibility
+            Button(action: {
+                showingReport = false
+            }) {
+                HStack(spacing: 8) {
+                    Image(systemName: "chevron.left")
+                    Text("Back")
+                }
+                .foregroundColor(Color.brandSkyBlue)
+                .font(.system(size: 16, weight: .medium))
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+                .background(Color.brandSkyBlue.opacity(0.1))
+                .cornerRadius(8)
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 20)
         }
         .background(Color.brandWhite)
     }
