@@ -20,6 +20,39 @@ class AIService: ObservableObject {
     
 
     
+    // MARK: - Bin Type Enum
+    
+    enum BinType: String, CaseIterable {
+        case red = "red"
+        case yellow = "yellow"
+        case green = "green"
+        case purple = "purple"
+        case ewaste = "ewaste"
+        case other = "other"
+        case none = "No Bin"
+        
+        var color: String {
+            switch self {
+            case .red: return "red"
+            case .yellow: return "yellow"
+            case .green: return "green"
+            case .purple: return "purple"
+            case .ewaste, .other, .none: return "gray"
+            }
+        }
+        
+        var imageName: String {
+            switch self {
+            case .red: return "Red Bin"
+            case .yellow: return "Yellow Bin"
+            case .green: return "Green Bin"
+            case .purple: return "Purple Bin"
+            case .ewaste, .none: return "Grey Bin"
+            case .other: return "Transfer Station"
+            }
+        }
+    }
+    
     // MARK: - Waste Classification Result
     
     struct WasteClassificationResult {
@@ -30,16 +63,13 @@ class AIService: ObservableObject {
         let description: String
         let instructions: String
         let confidence: Double
-        case none = "No Bin"
         
-        var color: String {
-            switch self {
-            }
+        var binColor: String {
+            return binType.color
         }
         
-        var imageName: String {
-            switch self {
-            }
+        var binImageName: String {
+            return binType.imageName
         }
     }
     

@@ -242,6 +242,7 @@ struct ContentView: View {
             break
         }
     }
+}
 
 #Preview {
     ContentView()
