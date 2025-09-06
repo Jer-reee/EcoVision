@@ -26,6 +26,7 @@ class GooglePlacesService: ObservableObject {
             return
         }
         
+<<<<<<< HEAD
         print("🔍 GOOGLE PLACES SEARCH STARTED:")
         print("📝 Query: \(query)")
         if let location = location {
@@ -38,17 +39,28 @@ class GooglePlacesService: ObservableObject {
         errorMessage = nil
         
         // Set place properties to focus on addresses with more details for residential filtering
+=======
+        isLoading = true
+        errorMessage = nil
+        
+        // Set place properties to focus on addresses
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
         let placeProperties: [String] = [
             "name",
             "formattedAddress",
             "coordinate",
+<<<<<<< HEAD
             "placeID",
             "addressComponents",
             "types"
+=======
+            "placeID"
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
         ]
         
         let request = GMSPlaceSearchByTextRequest(textQuery: query, placeProperties: placeProperties)
         
+<<<<<<< HEAD
         // Set location bias to Ballarat area (defaults to Ballarat, Victoria)
         if let location = location {
             request.locationBias = GMSPlaceCircularLocationOption(location, 30000.0) // 30km radius
@@ -64,6 +76,17 @@ class GooglePlacesService: ObservableObject {
         //     CLLocationCoordinate2D(latitude: -36.0, longitude: 150.0)  // Northeast corner
         // )
         
+=======
+        // Set location bias if provided (defaults to Melbourne, Australia)
+        if let location = location {
+            request.locationBias = GMSPlaceCircularLocationOption(location, 50000.0) // 50km radius
+        } else {
+            // Default to Melbourne, Australia
+            let melbourneLocation = CLLocationCoordinate2D(latitude: -37.8136, longitude: 144.9631)
+            request.locationBias = GMSPlaceCircularLocationOption(melbourneLocation, 50000.0)
+        }
+        
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
         placesClient.searchByText(with: request) { [weak self] results, error in
             DispatchQueue.main.async {
                 self?.isLoading = false
@@ -71,21 +94,28 @@ class GooglePlacesService: ObservableObject {
                 if let error = error {
                     self?.errorMessage = "Search failed: \(error.localizedDescription)"
                     print("❌ Google Places search error: \(error)")
+<<<<<<< HEAD
                     print("❌ Error details: \(error)")
                     if let nsError = error as NSError? {
                         print("❌ Error domain: \(nsError.domain)")
                         print("❌ Error code: \(nsError.code)")
                         print("❌ Error userInfo: \(nsError.userInfo)")
                     }
+=======
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
                     return
                 }
                 
                 guard let results = results else {
+<<<<<<< HEAD
                     print("❌ No results returned from Google Places API")
+=======
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
                     self?.searchResults = []
                     return
                 }
                 
+<<<<<<< HEAD
                 print("📊 Raw results count: \(results.count)")
                 
                 // Filter and format results for residential addresses in Ballarat area
@@ -123,10 +153,18 @@ class GooglePlacesService: ObservableObject {
                         placeID: place.placeID ?? "",
                         name: place.name ?? "",
                         address: expandedAddress,
+=======
+                self?.searchResults = results.map { place in
+                    PlaceResult(
+                        placeID: place.placeID ?? "",
+                        name: place.name ?? "",
+                        address: place.formattedAddress ?? "",
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
                         coordinate: place.coordinate
                     )
                 }
                 
+<<<<<<< HEAD
                 // If no results after filtering, try with less restrictive filtering
                 if filteredResults.isEmpty && !results.isEmpty {
                     print("⚠️ No results after filtering, trying less restrictive approach...")
@@ -158,6 +196,9 @@ class GooglePlacesService: ObservableObject {
                     self?.searchResults = filteredResults
                     print("✅ Found \(self?.searchResults.count ?? 0) address results")
                 }
+=======
+                print("✅ Found \(self?.searchResults.count ?? 0) address results")
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
             }
         }
     }
@@ -173,6 +214,7 @@ class GooglePlacesService: ObservableObject {
         errorMessage = nil
     }
     
+<<<<<<< HEAD
     // MARK: - Address Formatting
     
     private func expandAddressAbbreviations(_ address: String) -> String {
@@ -240,6 +282,8 @@ class GooglePlacesService: ObservableObject {
         return expandedAddress
     }
     
+=======
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
     // MARK: - Cleanup
     
     deinit {

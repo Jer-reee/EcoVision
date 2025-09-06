@@ -112,6 +112,7 @@ struct NavigationTabView: View {
         .buttonStyle(PlainButtonStyle())
     }
 }
+<<<<<<< HEAD
 
 // MARK: - Floating Back Button
 
@@ -217,3 +218,5 @@ struct ScrollOffsetPreferenceKey: PreferenceKey {
         value = nextValue()
     }
 }
+=======
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a

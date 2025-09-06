@@ -6,7 +6,10 @@
 //
 
 import SwiftUI
+<<<<<<< HEAD
 import GooglePlaces
+=======
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
 
 // MARK: - Profile View
 
@@ -31,6 +34,7 @@ struct ProfileView: View {
             
             VStack(alignment: .leading, spacing: 24) {
                 // Address Section
+<<<<<<< HEAD
                 AddressDisplayView(address: $address)
                     .onChange(of: address) { oldValue, newValue in
                         // Fetch collection data when address is selected
@@ -38,6 +42,21 @@ struct ProfileView: View {
                             wasteService.fetchWasteCollection(for: newValue)
                         }
                     }
+=======
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Address:")
+                        .font(.system(size: 16))
+                        .fontWeight(.medium)
+                        .foregroundColor(Color.brandVeryDarkBlue)
+                    
+                    AddressSearchView(selectedAddress: $address) { selectedAddress in
+                        // Fetch collection data when address is selected
+                        if !selectedAddress.isEmpty {
+                            wasteService.fetchWasteCollection(for: selectedAddress)
+                        }
+                    }
+                }
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
                 
                 // Notifications Section
                 VStack(alignment: .leading, spacing: 12) {
@@ -251,6 +270,7 @@ struct ProfileView: View {
         }
     }
 }
+<<<<<<< HEAD
 
 // MARK: - Address Display Component
 
@@ -524,3 +544,5 @@ struct AddressEditSheet: View {
         placesService.clearResults()
     }
 }
+=======
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a

@@ -10,7 +10,10 @@ import PhotosUI
 import AVFoundation
 import Foundation
 import GooglePlaces
+<<<<<<< HEAD
 import MessageUI
+=======
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
 
 struct ContentView: View {
     @State private var showingImagePicker = false
@@ -40,15 +43,23 @@ struct ContentView: View {
                         aiResult: result,
                         selectedImage: selectedImage,
                         showingResult: $showingAIResult,
+<<<<<<< HEAD
                         showingReportError: $showingReportError,
                         showingManualSearch: $showingManualSearch
+=======
+                        showingReportError: $showingReportError
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
                     )
                 } else if showingNoBinResult {
                     NoBinResultView(
                         selectedImage: selectedImage,
                         showingResult: $showingNoBinResult,
+<<<<<<< HEAD
                         showingReportError: $showingReportError,
                         showingManualSearch: $showingManualSearch
+=======
+                        showingReportError: $showingReportError
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
                     )
                 } else if showingManualSearch {
                     ManualSearchView(
@@ -205,9 +216,15 @@ struct ContentView: View {
             print("📝 Description: \(result.description)")
             print("📋 Instructions: \(result.instructions)")
             print("📊 Confidence: \(String(format: "%.2f", result.confidence * 100))%")
+<<<<<<< HEAD
             print("🔧 Special Collection: \(result.binType == .ewaste || result.binType == .other)")
             if result.binType == .ewaste || result.binType == .other {
                 print("📦 Special Collection Type: \(result.binType.rawValue)")
+=======
+            print("🔧 Special Collection: \(result.isSpecialCollection)")
+            if let specialType = result.specialCollectionType {
+                print("📦 Special Collection Type: \(specialType)")
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
             }
 
             print("----------------------------------------")
@@ -232,6 +249,7 @@ struct ContentView: View {
             showingAILoading = false
             aiClassificationResult = result
             
+<<<<<<< HEAD
             // Fallback routing: Check instructions if bin type is "none" but instructions suggest a specific bin
             let finalBinType = determineCorrectBinType(from: result)
             
@@ -260,10 +278,23 @@ struct ContentView: View {
             case .red, .yellow, .green, .purple, .ewaste, .other:
                 print("AI Result View (Regular Bin)")
                 showingAIResult = true
+=======
+            switch result.binType {
+            case .none:
+                print("No Bin Result View")
+                showingNoBinResult = true
+            case .yellow, .red, .green, .purple:
+                print("AI Result View (Regular Bin)")
+                showingAIResult = true
+            case .special:
+                print("AI Result View (Special Collection)")
+                showingAIResult = true
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
             }
         }
     }
     
+<<<<<<< HEAD
     // MARK: - Fallback Routing Logic
     
     private func determineCorrectBinType(from result: AIService.WasteClassificationResult) -> AIService.BinType {
@@ -300,6 +331,8 @@ struct ContentView: View {
         return .none
     }
     
+=======
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
     private func checkCameraPermission() {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
@@ -321,6 +354,7 @@ struct ContentView: View {
     }
 }
 
+<<<<<<< HEAD
 // MARK: - Manual Search View
 
 struct ManualSearchView: View {
@@ -727,6 +761,8 @@ class EmailService: NSObject, ObservableObject, MFMailComposeViewControllerDeleg
     }
 }
 
+=======
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
 #Preview {
     ContentView()
 }

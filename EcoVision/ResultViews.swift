@@ -6,7 +6,10 @@
 //
 
 import SwiftUI
+<<<<<<< HEAD
 import MessageUI
+=======
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
 
 // MARK: - AI Recognition Result View
 
@@ -15,6 +18,7 @@ struct AIResultView: View {
     let selectedImage: UIImage?
     @Binding var showingResult: Bool
     @Binding var showingReportError: Bool
+<<<<<<< HEAD
     @Binding var showingManualSearch: Bool
     
     private var binColor: Color {
@@ -33,10 +37,36 @@ struct AIResultView: View {
                 }) {
             VStack(spacing: 0) {
                 // Captured Image Display - Full width at top
+=======
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            // Header with back button
+            HStack {
+                Button(action: {
+                    showingResult = false
+                }) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "chevron.left")
+                        Text("Back")
+                    }
+                    .foregroundColor(Color.brandSkyBlue)
+                    .font(.system(size: 16))
+                }
+                
+                Spacer()
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 20)
+            .padding(.bottom, 30)
+            
+            // Captured Image Display
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
             if let image = selectedImage {
                 Image(uiImage: image)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
+<<<<<<< HEAD
                         .frame(height: 250)
                     .clipped()
             } else {
@@ -177,6 +207,68 @@ struct AIResultView: View {
                                     )
                             )
                         }
+=======
+                    .frame(height: 200)
+                    .clipped()
+                    .cornerRadius(12)
+                    .padding(.horizontal, 20)
+            } else {
+                Rectangle()
+                    .fill(Color.gray.opacity(0.3))
+                    .frame(height: 200)
+                    .overlay(
+                        Image(systemName: "photo")
+                            .font(.system(size: 40))
+                            .foregroundColor(.gray)
+                    )
+                    .cornerRadius(12)
+                    .padding(.horizontal, 20)
+            }
+            
+            Spacer()
+            
+            // Item Identification
+            VStack(spacing: 16) {
+                Text(aiResult.itemName)
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundColor(Color.brandVeryDarkBlue)
+                
+                // Bin Recommendation
+                HStack(spacing: 16) {
+                    Image(aiResult.binImageName)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 60, height: 60)
+                        .foregroundColor(Color(aiResult.binColor.lowercased()))
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(aiResult.binType.rawValue)
+                            .font(.title3)
+                            .fontWeight(.medium)
+                            .foregroundColor(Color(aiResult.binColor.lowercased()))
+                        
+                        if aiResult.confidence < 0.8 {
+                            Text("Low confidence")
+                                .font(.caption)
+                                .foregroundColor(.orange)
+                        }
+                    }
+                }
+                
+                Text(aiResult.description)
+                    .font(.system(size: 14))
+                    .foregroundColor(Color.brandVeryDarkBlue)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(nil)
+                
+                Text(aiResult.instructions)
+                    .font(.system(size: 14))
+                    .foregroundColor(Color.brandVeryDarkBlue)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(nil)
+                    .padding(.top, 8)
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
                 
                 // Report Error Button
                 Button(action: {
@@ -185,6 +277,7 @@ struct AIResultView: View {
                         showingReportError = true
                     }
                 }) {
+<<<<<<< HEAD
                             HStack(spacing: 4) {
                         Text("Report Error")
                                     .font(.system(size: 13))
@@ -211,6 +304,20 @@ struct AIResultView: View {
                 .padding(.top, 16)
                 .padding(.bottom, 100)
             }
+=======
+                    HStack(spacing: 8) {
+                        Text("Report Error")
+                            .font(.system(size: 14))
+                        Image(systemName: "exclamationmark.circle")
+                            .font(.system(size: 14))
+                    }
+                    .foregroundColor(.red)
+                }
+                .padding(.top, 16)
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 120)
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
         }
         .background(Color.brandWhite)
     }
@@ -222,6 +329,7 @@ struct NoBinResultView: View {
     let selectedImage: UIImage?
     @Binding var showingResult: Bool
     @Binding var showingReportError: Bool
+<<<<<<< HEAD
     @Binding var showingManualSearch: Bool
     
     var body: some View {
@@ -230,10 +338,36 @@ struct NoBinResultView: View {
                 }) {
             VStack(spacing: 0) {
                 // Captured Image Display - Full width at top
+=======
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            // Header with back button
+            HStack {
+                Button(action: {
+                    showingResult = false
+                }) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "chevron.left")
+                        Text("Back")
+                    }
+                    .foregroundColor(Color.brandSkyBlue)
+                    .font(.system(size: 16))
+                }
+                
+                Spacer()
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 20)
+            .padding(.bottom, 30)
+            
+            // Captured Image Display
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
             if let image = selectedImage {
                 Image(uiImage: image)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
+<<<<<<< HEAD
                         .frame(height: 250)
                     .clipped()
             } else {
@@ -334,6 +468,60 @@ struct NoBinResultView: View {
                 Rectangle()
                     .fill(Color.green.opacity(0.3))
                             .frame(height: 120)
+=======
+                    .frame(height: 200)
+                    .clipped()
+                    .cornerRadius(12)
+                    .padding(.horizontal, 20)
+            } else {
+                Rectangle()
+                    .fill(Color.gray.opacity(0.3))
+                    .frame(height: 200)
+                    .overlay(
+                        Image(systemName: "photo")
+                            .font(.system(size: 40))
+                            .foregroundColor(.gray)
+                    )
+                    .cornerRadius(12)
+                    .padding(.horizontal, 20)
+            }
+            
+            Spacer()
+            
+            // No Bin Result
+            VStack(spacing: 16) {
+                Text("Batteries")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundColor(Color.brandVeryDarkBlue)
+                
+                // "Do not throw in bins" indicator
+                HStack(spacing: 16) {
+                    Image(systemName: "trash.slash")
+                        .font(.system(size: 50))
+                        .foregroundColor(.gray)
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Do not throw")
+                            .font(.system(size: 14))
+                            .foregroundColor(.gray)
+                        Text("in the Bins")
+                            .font(.system(size: 14))
+                            .foregroundColor(.gray)
+                    }
+                }
+                
+                Text("Batteries cannot be placed in bin as they can cause fires and damage in environment!\nPlease see the map below for battery/e-waste collection points.")
+                    .font(.system(size: 14))
+                    .foregroundColor(Color.brandVeryDarkBlue)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(nil)
+                
+                // Map Section
+                Rectangle()
+                    .fill(Color.green.opacity(0.3))
+                    .frame(height: 150)
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
                     .overlay(
         VStack {
                             Text("🗺️")
@@ -343,6 +531,7 @@ struct NoBinResultView: View {
                                 .foregroundColor(Color.brandMutedBlue)
                         }
                     )
+<<<<<<< HEAD
                             .cornerRadius(12)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
@@ -356,6 +545,12 @@ struct NoBinResultView: View {
                             .font(.system(size: 16, weight: .medium))
                             .foregroundColor(Color.brandVeryDarkBlue)
                         
+=======
+                    .cornerRadius(8)
+                    .padding(.top, 16)
+                
+                // Location Details
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
                 VStack(alignment: .leading, spacing: 8) {
                     Text("CDS Vic Alfred Square")
                         .font(.system(size: 16))
@@ -395,6 +590,7 @@ struct NoBinResultView: View {
                         }
                     }
                     .padding(.top, 4)
+<<<<<<< HEAD
                         }
                         .padding(12)
                         .background(
@@ -437,6 +633,11 @@ struct NoBinResultView: View {
                                     )
                             )
                         }
+=======
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.top, 12)
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
                 
                 // Report Error Button
                 Button(action: {
@@ -445,6 +646,7 @@ struct NoBinResultView: View {
                         showingReportError = true
                     }
                 }) {
+<<<<<<< HEAD
                             HStack(spacing: 4) {
                         Text("Report Error")
                                     .font(.system(size: 13))
@@ -472,6 +674,22 @@ struct NoBinResultView: View {
                 .padding(.top, 16)
             }
             .background(Color.brandWhite)
+=======
+                    HStack(spacing: 8) {
+                        Text("Report Error")
+                            .font(.system(size: 14))
+                        Image(systemName: "exclamationmark.circle")
+                            .font(.system(size: 14))
+                    }
+                    .foregroundColor(.red)
+                }
+                .padding(.top, 16)
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 120)
+        }
+        .background(Color.brandWhite)
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
     }
 }
 
@@ -489,15 +707,21 @@ struct ManualSearchView: View {
     @StateObject private var aiService = AIService()
     
     var body: some View {
+<<<<<<< HEAD
             ScrollableViewWithFloatingBack(backAction: {
                 showingSearch = false
             }) {
         VStack(spacing: 0) {
             // Captured Image Display - Full width at top
+=======
+        VStack(spacing: 0) {
+            // Captured Image Display
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
             if let image = selectedImage {
                 Image(uiImage: image)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
+<<<<<<< HEAD
                     .frame(height: 250)
                     .clipped()
             } else {
@@ -541,6 +765,47 @@ struct ManualSearchView: View {
                             RoundedRectangle(cornerRadius: 12)
                                 .stroke(Color.brandMutedBlue.opacity(0.3), lineWidth: 1)
                         )
+=======
+                    .frame(height: 200)
+                    .clipped()
+                    .cornerRadius(12)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
+            } else {
+                Rectangle()
+                    .fill(Color.gray.opacity(0.3))
+                    .frame(height: 200)
+                    .overlay(
+                        Image(systemName: "photo")
+                            .font(.system(size: 40))
+                            .foregroundColor(.gray)
+                    )
+                    .cornerRadius(12)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
+            }
+            
+            Spacer()
+            
+            // Manual Search Interface
+            VStack(spacing: 16) {
+                Text("Manual Search")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundColor(Color.brandVeryDarkBlue)
+                
+                Text("Enter the name of the item you want to recycle")
+                    .font(.system(size: 14))
+                    .foregroundColor(Color.brandVeryDarkBlue)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(nil)
+                
+                // Search Field
+                HStack(spacing: 12) {
+                    TextField("e.g., cardboard box, plastic bottle...", text: $searchText)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .font(.system(size: 16))
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
                         .disabled(isSearching)
                     
                     // Search Button
@@ -549,13 +814,18 @@ struct ManualSearchView: View {
                             await performTextSearch()
                         }
                     }) {
+<<<<<<< HEAD
                         HStack(spacing: 8) {
+=======
+                        HStack(spacing: 6) {
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
                             if isSearching {
                                 ProgressView()
                                     .scaleEffect(0.8)
                                     .progressViewStyle(CircularProgressViewStyle(tint: .white))
                             } else {
                                 Image(systemName: "magnifyingglass")
+<<<<<<< HEAD
                                     .font(.system(size: 16, weight: .medium))
                             }
                             Text(isSearching ? "Searching..." : "Search")
@@ -572,10 +842,31 @@ struct ManualSearchView: View {
                     }
                     .disabled(searchText.isEmpty || isSearching)
                 }
+=======
+                                    .font(.system(size: 14, weight: .medium))
+                            }
+                            Text(isSearching ? "Searching..." : "Search")
+                                .font(.system(size: 14, weight: .medium))
+                        }
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 10)
+                        .background(
+                            searchText.isEmpty || isSearching 
+                                ? Color.gray 
+                                : Color.brandSkyBlue
+                        )
+                        .cornerRadius(8)
+                    }
+                    .disabled(searchText.isEmpty || isSearching)
+                }
+                .padding(.top, 20)
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
                 
                 // Error Message
                 if let errorMessage = errorMessage {
                     Text(errorMessage)
+<<<<<<< HEAD
                         .font(.system(size: 14))
                         .foregroundColor(.red)
                         .multilineTextAlignment(.center)
@@ -588,6 +879,12 @@ struct ManualSearchView: View {
                                         .stroke(Color.red.opacity(0.3), lineWidth: 1)
                                 )
                         )
+=======
+                        .font(.system(size: 12))
+                        .foregroundColor(.red)
+                        .multilineTextAlignment(.center)
+                        .padding(.top, 8)
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
                 }
                 
                 // Report Error Button
@@ -599,6 +896,7 @@ struct ManualSearchView: View {
                 }) {
                     HStack(spacing: 8) {
                         Text("Report Error")
+<<<<<<< HEAD
                             .font(.system(size: 16, weight: .medium))
                         Image(systemName: "exclamationmark.circle")
                             .font(.system(size: 16))
@@ -620,6 +918,37 @@ struct ManualSearchView: View {
             .padding(.horizontal, 12)
             .padding(.top, 16)
             .padding(.bottom, 100)
+=======
+                            .font(.system(size: 14))
+                        Image(systemName: "exclamationmark.circle")
+                            .font(.system(size: 14))
+                    }
+                    .foregroundColor(.red)
+                }
+                .padding(.top, 16)
+            }
+            .padding(.horizontal, 20)
+            
+            Spacer()
+            
+            // Back Button at bottom for better accessibility
+            Button(action: {
+                showingSearch = false
+            }) {
+                HStack(spacing: 8) {
+                    Image(systemName: "chevron.left")
+                    Text("Back")
+                }
+                .foregroundColor(Color.brandSkyBlue)
+                .font(.system(size: 16, weight: .medium))
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+                .background(Color.brandSkyBlue.opacity(0.1))
+                .cornerRadius(8)
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 20)
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
         }
         .background(Color.brandWhite)
         .sheet(isPresented: $showingSearchResult) {
@@ -628,8 +957,12 @@ struct ManualSearchView: View {
                     aiResult: result,
                     selectedImage: selectedImage,
                     showingResult: $showingSearchResult,
+<<<<<<< HEAD
                         showingReportError: $showingReportError,
                         showingManualSearch: $showingSearch
+=======
+                    showingReportError: $showingReportError
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
                 )
             }
         }
@@ -662,9 +995,15 @@ struct ManualSearchView: View {
             print("📝 Description: \(result.description)")
             print("📋 Instructions: \(result.instructions)")
             print("📊 Confidence: \(String(format: "%.2f", result.confidence * 100))%")
+<<<<<<< HEAD
                 print("🔧 Special Collection: \(result.binType == .ewaste || result.binType == .other)")
                 if result.binType == .ewaste || result.binType == .other {
                     print("📦 Special Collection Type: \(result.binType.rawValue)")
+=======
+            print("🔧 Special Collection: \(result.isSpecialCollection)")
+            if let specialType = result.specialCollectionType {
+                print("📦 Special Collection Type: \(specialType)")
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
             }
 
             print("----------------------------------------")
@@ -691,6 +1030,7 @@ struct ReportErrorView: View {
     @State private var email = ""
     @State private var problemDescription = ""
     @Binding var showingReport: Bool
+<<<<<<< HEAD
         @StateObject private var emailService = EmailService()
         @State private var showingAlert = false
         @State private var alertMessage = ""
@@ -699,6 +1039,10 @@ struct ReportErrorView: View {
             ScrollableViewWithFloatingBack(backAction: {
                 showingReport = false
             }) {
+=======
+    
+    var body: some View {
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
         VStack(spacing: 0) {
             
             VStack(alignment: .leading, spacing: 24) {
@@ -714,6 +1058,7 @@ struct ReportErrorView: View {
                         .fontWeight(.medium)
                         .foregroundColor(Color.brandVeryDarkBlue)
                     
+<<<<<<< HEAD
                         TextField("Enter your email address", text: $email)
                         .font(.system(size: 14))
                             .padding(12)
@@ -726,6 +1071,11 @@ struct ReportErrorView: View {
                                 RoundedRectangle(cornerRadius: 12)
                                     .stroke(Color.brandMutedBlue.opacity(0.3), lineWidth: 1)
                             )
+=======
+                    TextField("", text: $email)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .font(.system(size: 14))
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
                 }
                 
                 // Problem Description Field
@@ -737,6 +1087,7 @@ struct ReportErrorView: View {
                     
                     TextEditor(text: $problemDescription)
                         .frame(height: 120)
+<<<<<<< HEAD
                             .font(.system(size: 14))
                             .padding(12)
                             .background(
@@ -749,6 +1100,14 @@ struct ReportErrorView: View {
                                     .stroke(Color.brandMutedBlue.opacity(0.3), lineWidth: 1)
                         )
                     }
+=======
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                        )
+                        .font(.system(size: 14))
+                }
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
             }
             .padding(.horizontal, 20)
             
@@ -764,12 +1123,18 @@ struct ReportErrorView: View {
                     .fontWeight(.medium)
                     .foregroundColor(Color.brandWhite)
                     .frame(maxWidth: .infinity)
+<<<<<<< HEAD
                         .padding(.vertical, 14)
                         .background(
                             RoundedRectangle(cornerRadius: 12)
                                 .fill(Color.brandVeryDarkBlue)
                                 .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
                         )
+=======
+                    .padding(.vertical, 12)
+                    .background(Color.brandVeryDarkBlue)
+                    .cornerRadius(8)
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 80)
@@ -786,6 +1151,7 @@ struct ReportErrorView: View {
                 .font(.system(size: 16, weight: .medium))
                 .padding(.horizontal, 20)
                 .padding(.vertical, 12)
+<<<<<<< HEAD
                     .background(
                         RoundedRectangle(cornerRadius: 12)
                             .fill(Color.brandSkyBlue.opacity(0.1))
@@ -857,5 +1223,14 @@ struct ReportErrorView: View {
                 emailResult = .success(result)
             }
         }
+=======
+                .background(Color.brandSkyBlue.opacity(0.1))
+                .cornerRadius(8)
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 20)
+        }
+        .background(Color.brandWhite)
+>>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
     }
 }
