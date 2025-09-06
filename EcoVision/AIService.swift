@@ -19,7 +19,6 @@ class AIService: ObservableObject {
     private let baseURL = "https://api.openai.com/v1/chat/completions"
     
 
-"""
     
     // MARK: - Waste Classification Result
     
@@ -88,26 +87,7 @@ class AIService: ObservableObject {
     // MARK: - ChatGPT Request Creation
     
     private func createChatGPTRequest(imageBase64: String) -> [String: Any] {
-        let systemPrompt = """
-        You are a waste classification expert for Ballarat, Victoria, Australia. Analyze the provided image and classify the waste item according to Ballarat's recycling standards.
-
-        BIN TYPES:
-        - red: General waste (landfill)
-        - yellow: Paper and plastic recycling
-        - green: Food waste and green waste
-        - purple: Glass recycling
-        - ewaste: E-waste (batteries, electronics, computers, phones, appliances)
-        - other: Take to transfer station (large items, hazardous materials)
-
-        Respond with a JSON object in this exact format:
-        {
-            "itemName": "exact item name",
-            "binType": "red|yellow|green|purple|ewaste|other",
-            "description": "brief description of the item",
-            "instructions": "specific disposal instructions",
-            "confidence": 0.99
-        }
-        """
+        let systemPrompt = "You are a waste classification expert for Ballarat, Victoria, Australia. Analyze the provided image and classify the waste item according to Ballarat's recycling standards. BIN TYPES: red (General waste), yellow (Paper and plastic recycling), green (Food waste and green waste), purple (Glass recycling), ewaste (E-waste), other (Take to transfer station). Respond with a JSON object: {\"itemName\": \"exact item name\", \"binType\": \"red|yellow|green|purple|ewaste|other\", \"description\": \"brief description\", \"instructions\": \"specific disposal instructions\", \"confidence\": 0.99}"
         
         return [
             "model": AIConfig.model,
@@ -307,26 +287,7 @@ class AIService: ObservableObject {
     // MARK: - ChatGPT Text Request Creation
     
     private func createChatGPTTextRequest(text: String) -> [String: Any] {
-        let systemPrompt = """
-        You are a waste classification expert for Ballarat, Victoria, Australia. Analyze the provided text description and classify the waste item according to Ballarat's recycling standards.
-
-        BIN TYPES:
-        - red: General waste (landfill)
-        - yellow: Paper and plastic recycling
-        - green: Food waste and green waste
-        - purple: Glass recycling
-        - ewaste: E-waste (batteries, electronics, computers, phones, appliances)
-        - other: Take to transfer station (large items, hazardous materials)
-
-        Respond with a JSON object in this exact format:
-        {
-            "itemName": "exact item name",
-            "binType": "red|yellow|green|purple|ewaste|other",
-            "description": "brief description of the item",
-            "instructions": "specific disposal instructions",
-            "confidence": 0.95
-        }
-        """
+        let systemPrompt = "You are a waste classification expert for Ballarat, Victoria, Australia. Analyze the provided text description and classify the waste item according to Ballarat's recycling standards. BIN TYPES: red (General waste), yellow (Paper and plastic recycling), green (Food waste and green waste), purple (Glass recycling), ewaste (E-waste), other (Take to transfer station). Respond with a JSON object: {\"itemName\": \"exact item name\", \"binType\": \"red|yellow|green|purple|ewaste|other\", \"description\": \"brief description\", \"instructions\": \"specific disposal instructions\", \"confidence\": 0.95}"
         
         return [
             "model": AIConfig.model,
