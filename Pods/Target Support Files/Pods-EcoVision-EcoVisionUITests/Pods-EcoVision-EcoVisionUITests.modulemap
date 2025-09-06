@@ -1,0 +1,6 @@
+framework module Pods_EcoVision_EcoVisionUITests {
+  umbrella header "Pods-EcoVision-EcoVisionUITests-umbrella.h"
+
+  export *
+  module * { export * }
+}
