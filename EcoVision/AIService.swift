@@ -18,172 +18,6 @@ class AIService: ObservableObject {
     let apiKey = AIConfig.openAIAPIKey
     private let baseURL = "https://api.openai.com/v1/chat/completions"
     
-<<<<<<< HEAD
-        // MARK: - Ballarat Waste Guide Standards
-    private let ballaratWasteGuide = """
-BALLARAT WASTE GUIDE (City of Ballarat):
-
-RED BIN (General Waste):
-- Nappies, baby wipes
-- Plastic bags, soft plastics
-- Takeaway coffee cups, straws
-- Toothpaste tubes, toothbrushes
-- Meat trays, foil trays
-- Gloves, band aids, earbuds, wipes
-- Cigarette butts, cling wrap/plastic film
-- Coffee cups and lids
-- Face wipes, sanitary products
-- Kitty litter, animal waste
-- Vacuum cleaner dust
-- Waxed cardboard, waxed/toiled paper
-- Polystyrene (household plastic #6)
-- Styrofoam, foam boxes
-- Non-recyclable materials
-
-YELLOW BIN (Paper and Plastic Recycling):
-- CLEAN, EMPTY cans and aluminium
-- Plastic bottles and containers from kitchen, laundry and bathroom
-- Paper and cardboard
-- Aluminium foil (clean of food)
-- Cardboard, magazines, newspapers
-- Office paper, envelopes (no window)
-- Greeting cards, telephone books
-- Pizza boxes (clean of food and oils)
-- Tissue boxes with plastic removed
-- Toilet rolls (empty)
-- Milk bottles (plastic #2) no lids
-- Juice bottles (with no handle)
-- Cordial bottles (with handle)
-- Shampoo and conditioner bottles
-- Detergent bottles (empty)
-- Sauce bottles (empty)
-- Medicine bottles (glass) (clean)
-- Cosmetic containers (plastic or glass)
-- Ice cream containers (clean)
-- Margarine containers (clean)
-- Yoghurt containers (clean)
-- Takeaway containers (plastic) (clean)
-- Plastic containers (rigid plastic)
-- Plant pots (empty)
-- Long life cartons, Tetra Paks
-- NO LIDS of any type
-- DO NOT BAG KEEP IT LOOSE
-
-GREEN BIN (Food Waste and Green Waste):
-- Leaves, weeds, prunings
-- Grass, flowers and small branches 10mm in diameter and 55mm long
-- Tree prunings, branches (trees)
-- Garden clippings and prunings
-- Fruit and vegetables
-- Food scraps and organic waste
-- Kitchen waste, vegetable scraps
-- Tea bags with string
-- DO NOT BAG KEEP IT LOOSE
-
-PURPLE BIN (Glass Recycling):
-- Glass bottles and jars (all colors)
-- Wine bottles (empty)
-- Beer bottles
-- Food jars and containers
-- Alcohol bottles glass (no lids)
-- Glass containers (clean and empty)
-- Glass ware, ceramics (broken)
-- Window glass (broken-wrapped)
-- NO LIDS of any type
-
-E-WASTE (Take to Transfer Station):
-- Electronic waste (e-waste)
-- Batteries (car and household)
-- Cameras, computers (and parts)
-- Mobile phones, music cards
-- Radios, televisions
-- VCRs/VHS players
-- Microwaves, refrigerators
-- Washing machines, white goods
-- Fridges/freezers/white goods
-- Toys (electric)
-- Smoke alarms
-- Light globes (compact fluorescent tubes)
-- Hearing aid batteries
-- Printers and printer cartridges
-- All electronic items cannot be placed in general waste bin
-
-OTHER (Take to Transfer Station):
-- Building waste (bricks, concrete, rubble etc)
-- Car parts (metal or electronic)
-- Carpets, doors
-- Furniture (good condition - donate to charity)
-- Bicycles, lawn mowers
-- Scrap metals
-- Timber (treated), timber (natural, under 10cm diameter)
-- Wood (treated)
-- Soil and rock
-- Plaster board
-- Paint, paint tins
-- Chemicals (pool, garden, household)
-- Poisons, pesticides, farm chemicals
-- Fuels and diesels, oil (cooking), oil (engine)
-- Gas bottles (all types)
-- Drums (chemical containers - empty and triple rinsed)
-- Asbestos
-- Mattresses
-- Hypodermic needles (in sealable container)
-- Syringes/sharps (wrapped)
-- Medicines
-- X-ray images
-- Large logs (can be disposed at Transfer Station)
-
-SPECIAL NOTES:
-- Pass on glass drop-off sites located around Ballarat
-- Visit recyclingballarat.com or call 5320 5500 for glass drop-off sites
-- Ballarat Transfer Station: 119 Gillies Street South, Alfredton
-- Visit chemclear.org.au to register chemicals
-- Visit recyclingnearyou.com.au for more information
-- Visit returnmed.com.au/faqs for more information
-- Contact Environmental Health team for disposal information (25 Armstrong Street South, Ballarat)
-- Any public toilet provides a syringe bin and is collected by a contractor service
-=======
-        // MARK: - Ballarat Recycling Standards
-    private let ballaratRecyclingStandards = """
-BALLARAT RECYCLING STANDARDS:
-
-YELLOW BIN (Paper and Plastic Recycling):
-- Paper and cardboard (clean and dry)
-- Plastic bottles and containers (numbers 1-7)
-- Aluminium and steel cans and containers
-- Milk and juice cartons
-- Plastic packaging and containers
-
-RED BIN (General Waste):
-- Food waste and scraps
-- Plastic bags and soft plastics
-- Nappies and sanitary items
-- Broken ceramics and crockery
-- Contaminated items
-- Non-recyclable materials
-
-GREEN BIN (Organic and Garden Waste):
-- Garden clippings and prunings
-- Leaves and branches
-- Grass clippings
-- Weeds (without seeds)
-- Food scraps and organic waste
-- Kitchen waste
-
-PURPLE BIN (Glass Recycling):
-- Glass bottles and jars (all colors)
-- Wine and beer bottles
-- Food jars and containers
-- Glass containers (clean and empty)
-
-SPECIAL COLLECTION:
-- Batteries (household and car)
-- Electronics and e-waste
-- Light bulbs and fluorescent tubes
-- Paint and chemicals
-- Oil and filters
-- Mattresses and furniture
->>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
 
 """
     
@@ -197,82 +31,15 @@ SPECIAL COLLECTION:
         let description: String
         let instructions: String
         let confidence: Double
-<<<<<<< HEAD
-        
-        // Computed property to determine if this is a special collection
-        var isSpecialCollection: Bool {
-            return binType == .ewaste || binType == .other
-        }
-        
-        // Computed property to get the special collection type
-        var specialCollectionType: String? {
-            if isSpecialCollection {
-                return binType.rawValue
-            }
-            return nil
-        }
-    }
-    
-    enum BinType: String, CaseIterable {
-        case red = "Red Bin"
-        case yellow = "Yellow Bin"
-        case green = "Green Bin"
-        case purple = "Purple Bin"
-        case ewaste = "E-Waste"
-        case other = "Other"
-=======
-        let isSpecialCollection: Bool
-        let specialCollectionType: String?
-    }
-    
-    enum BinType: String, CaseIterable {
-        case yellow = "Yellow Bin"
-        case red = "Red Bin"
-        case green = "Green Bin"
-        case purple = "Purple Bin"
-        case special = "Special Collection"
->>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
         case none = "No Bin"
         
         var color: String {
             switch self {
-<<<<<<< HEAD
-            case .red: return "red"
-            case .yellow: return "yellow"
-            case .green: return "green"
-            case .purple: return "purple"
-            case .ewaste: return "gray"
-            case .other: return "gray"
-            case .none: return "gray"
-=======
-            case .yellow: return "Yellow"
-            case .red: return "Red"
-            case .green: return "Green"
-            case .purple: return "Purple"
-            case .special: return "Purple"
-            case .none: return "Gray"
->>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
             }
         }
         
         var imageName: String {
             switch self {
-<<<<<<< HEAD
-            case .red: return "Red Bin"
-            case .yellow: return "Yellow Bin"
-            case .green: return "Green Bin"
-            case .purple: return "Purple Bin"
-            case .ewaste: return "Grey Bin"
-            case .other: return "Transfer Station"
-            case .none: return "Grey Bin"
-=======
-            case .yellow: return "Yellow Bin"
-            case .red: return "Red Bin"
-            case .green: return "Green Bin"
-            case .purple: return "Purple Bin"
-            case .special: return "Purple Bin"
-            case .none: return "Gray Bin"
->>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
             }
         }
     }
@@ -322,95 +89,24 @@ SPECIAL COLLECTION:
     
     private func createChatGPTRequest(imageBase64: String) -> [String: Any] {
         let systemPrompt = """
-<<<<<<< HEAD
-        You are a waste classification expert for Ballarat, Australia. Analyze the provided image and classify the waste item according to Ballarat's official waste guide.
+        You are a waste classification expert for Ballarat, Victoria, Australia. Analyze the provided image and classify the waste item according to Ballarat's recycling standards.
 
-        \(ballaratWasteGuide)
-=======
-        You are a waste classification expert for Ballarat, Australia. Analyze the provided image and classify the waste item according to Ballarat's recycling standards.
-
-        \(ballaratRecyclingStandards)
->>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
+        BIN TYPES:
+        - red: General waste (landfill)
+        - yellow: Paper and plastic recycling
+        - green: Food waste and green waste
+        - purple: Glass recycling
+        - ewaste: E-waste (batteries, electronics, computers, phones, appliances)
+        - other: Take to transfer station (large items, hazardous materials)
 
         Respond with a JSON object in this exact format:
         {
             "itemName": "exact item name",
-<<<<<<< HEAD
-            "binType": "red|yellow|green|purple|ewaste|other|none",
+            "binType": "red|yellow|green|purple|ewaste|other",
             "description": "brief description of the item",
-            "instructions": "specific disposal instructions for Ballarat",
-            "confidence": 0.95,
+            "instructions": "specific disposal instructions",
+            "confidence": 0.99
         }
-
-        CLASSIFICATION RULES:
-        - Be very specific about the item name
-        - Use exact bin types: red, yellow, green, purple, ewaste, other, none
-        - CRITICAL: Always match the binType with your instructions
-        - CRITICAL: If you say "green bin" in instructions, you MUST use binType: "green"
-        - CRITICAL: If you say "yellow bin" in instructions, you MUST use binType: "yellow"
-        - CRITICAL: If you say "red bin" in instructions, you MUST use binType: "red"
-        - CRITICAL: If you say "purple bin" in instructions, you MUST use binType: "purple"
-        
-        BIN TYPE MAPPING:
-        - RED BIN: General waste, nappies, soft plastics, coffee cups, meat trays, non-recyclables
-        - YELLOW BIN: Clean empty cans, plastic bottles/containers, paper/cardboard (NO LIDS)
-        - GREEN BIN: Food scraps, garden waste, leaves, prunings, organic matter, flowers
-        - PURPLE BIN: Glass bottles/jars (NO LIDS)
-        - E-WASTE: Batteries, electronics, computers, phones, appliances
-        - OTHER: Building materials, chemicals, large items (take to transfer station)
-        - NONE: Only when truly unidentifiable
-        
-        MANDATORY EXAMPLES - Follow these exactly:
-        - Aluminum/Aluminium can (Coke, beer, etc.) → {"binType": "yellow"}
-        - Plastic bottle/container (clean, empty) → {"binType": "yellow"}
-        - Glass bottle/jar (clean, empty) → {"binType": "purple"}
-        - Food scraps/organic waste → {"binType": "green"}
-        - Flowers/garden waste → {"binType": "green"}
-        - Battery/electronics → {"binType": "ewaste"}
-        - Soft plastics/bags → {"binType": "red"}
-        - Building materials → {"binType": "other"}
-        
-        CRITICAL: If you say "red bin" in instructions, you MUST use binType: "red"
-        CRITICAL: If you say "yellow bin" in instructions, you MUST use binType: "yellow"
-        CRITICAL: If you say "green bin" in instructions, you MUST use binType: "green"
-        CRITICAL: If you say "purple bin" in instructions, you MUST use binType: "purple"
-        CRITICAL: If you say "e-waste" or "transfer station" in instructions, you MUST use binType: "ewaste" or "other"
-=======
-            "binType": "yellow|red|green|purple|special|none",
-            "description": "brief description of the item",
-            "instructions": "specific disposal instructions for Ballarat",
-            "confidence": 0.95,
-            "isSpecialCollection": false,
-            "specialCollectionType": null,
-
-        }
-
-        Rules:
-        - Be very specific about the item name
-        - Use exact bin types from the standards: yellow, red, green, purple, special, none
-        - CRITICAL: Always match the binType with your instructions
-        - ALUMINUM/ALUMINIUM CANS = "yellow" bin type (never "none")
-        - DRINK CONTAINERS (aluminum, plastic) = "yellow" bin type
-        - Glass bottles and jars = "purple" bin type
-        - Food waste and organic matter = "green" bin type
-        - Non-recyclable items = "red" bin type
-        - Batteries, electronics, chemicals = "special" bin type
-        - Only use "none" when truly unidentifiable
-        - Provide clear, actionable instructions that match your bin type choice
-        - Set confidence based on image clarity (0.0-1.0)
-        
-        MANDATORY EXAMPLES - Follow these exactly:
-        - Aluminum/Aluminium can (Coke, beer, etc.) → {"binType": "yellow"}
-        - Plastic bottle/container → {"binType": "yellow"}
-        - Glass bottle/jar → {"binType": "purple"}
-        - Food scraps/organic waste → {"binType": "green"}
-        - Battery/electronics → {"binType": "special"}
-        
-        CRITICAL: If you say "yellow bin" in instructions, you MUST use binType: "yellow"
-        CRITICAL: If you say "purple bin" in instructions, you MUST use binType: "purple"
-        CRITICAL: If you say "green bin" in instructions, you MUST use binType: "green"
-        CRITICAL: If you say "red bin" in instructions, you MUST use binType: "red"
->>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
         """
         
         return [
@@ -527,36 +223,6 @@ SPECIAL COLLECTION:
         print("🤖 RAW AI RESPONSE:")
         print("📄 Full Content: \(content)")
         
-<<<<<<< HEAD
-        // Extract JSON from ChatGPT response with improved error handling
-        let jsonString = extractJSONFromContent(content)
-        print("📋 Extracted JSON: \(jsonString)")
-        
-        // Validate JSON string is not empty
-        guard !jsonString.isEmpty else {
-            print("❌ Extracted JSON string is empty")
-            throw AIError.invalidResponse
-        }
-        
-        guard let jsonData = jsonString.data(using: .utf8),
-              let result = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any] else {
-            print("❌ Failed to parse JSON")
-            print("📋 JSON String that failed: \(jsonString)")
-=======
-        // Extract JSON from ChatGPT response
-        guard let jsonStart = content.range(of: "{"),
-              let jsonEnd = content.range(of: "}", options: .backwards) else {
-            print("❌ No JSON found in response")
-            throw AIError.invalidResponse
-        }
-        
-        let jsonString = String(content[jsonStart.lowerBound...jsonEnd.upperBound])
-        print("📋 Extracted JSON: \(jsonString)")
-        
-        guard let jsonData = jsonString.data(using: .utf8),
-              let result = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any] else {
-            print("❌ Failed to parse JSON")
->>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
             throw AIError.invalidResponse
         }
         
@@ -565,69 +231,6 @@ SPECIAL COLLECTION:
         return try createWasteClassificationResult(from: result)
     }
     
-<<<<<<< HEAD
-    // MARK: - JSON Extraction Helper
-    
-    private func extractJSONFromContent(_ content: String) -> String {
-        // First, try to find the first complete JSON object
-        guard let jsonStart = content.range(of: "{"),
-              let jsonEnd = content.range(of: "}", options: .backwards),
-              jsonEnd.upperBound > jsonStart.lowerBound else {
-            print("❌ No valid JSON found in response")
-            print("📄 Content length: \(content.count)")
-            print("📄 Content preview: \(String(content.prefix(200)))")
-            return ""
-        }
-        
-        // Extract the JSON string
-        let jsonString = String(content[jsonStart.lowerBound..<jsonEnd.upperBound])
-        
-        // Validate that we have a complete JSON object by checking bracket balance
-        let openBraces = jsonString.filter { $0 == "{" }.count
-        let closeBraces = jsonString.filter { $0 == "}" }.count
-        
-        if openBraces != closeBraces {
-            print("⚠️ Unbalanced JSON braces: \(openBraces) open, \(closeBraces) close")
-            // Try to find a more complete JSON object
-            return extractCompleteJSONFromContent(content)
-        }
-        
-        return jsonString
-    }
-    
-    private func extractCompleteJSONFromContent(_ content: String) -> String {
-        // More sophisticated JSON extraction that handles nested objects
-        var braceCount = 0
-        var jsonStart: String.Index?
-        var jsonEnd: String.Index?
-        
-        for (index, char) in content.enumerated() {
-            let stringIndex = content.index(content.startIndex, offsetBy: index)
-            
-            if char == "{" {
-                if jsonStart == nil {
-                    jsonStart = stringIndex
-                }
-                braceCount += 1
-            } else if char == "}" {
-                braceCount -= 1
-                if braceCount == 0 && jsonStart != nil {
-                    jsonEnd = content.index(after: stringIndex)
-                    break
-                }
-            }
-        }
-        
-        guard let start = jsonStart, let end = jsonEnd else {
-            print("❌ Could not find complete JSON object")
-            return ""
-        }
-        
-        return String(content[start..<end])
-    }
-    
-=======
->>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
     private func createWasteClassificationResult(from json: [String: Any]) throws -> WasteClassificationResult {
         guard let itemName = json["itemName"] as? String,
               let binTypeString = json["binType"] as? String,
@@ -638,11 +241,6 @@ SPECIAL COLLECTION:
         }
         
         let binType = BinType(rawValue: binTypeString) ?? .none
-<<<<<<< HEAD
-=======
-        let isSpecialCollection = json["isSpecialCollection"] as? Bool ?? false
-        let specialCollectionType = json["specialCollectionType"] as? String
->>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
         
         return WasteClassificationResult(
             itemName: itemName,
@@ -651,13 +249,6 @@ SPECIAL COLLECTION:
             binImageName: binType.imageName,
             description: description,
             instructions: instructions,
-<<<<<<< HEAD
-            confidence: confidence
-=======
-            confidence: confidence,
-            isSpecialCollection: isSpecialCollection,
-            specialCollectionType: specialCollectionType
->>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
         )
     }
     
@@ -717,80 +308,24 @@ SPECIAL COLLECTION:
     
     private func createChatGPTTextRequest(text: String) -> [String: Any] {
         let systemPrompt = """
-<<<<<<< HEAD
-        You are a waste classification expert for Ballarat, Australia. Analyze the provided text description and classify the waste item according to Ballarat's official waste guide.
+        You are a waste classification expert for Ballarat, Victoria, Australia. Analyze the provided text description and classify the waste item according to Ballarat's recycling standards.
 
-        \(ballaratWasteGuide)
-=======
-        You are a waste classification expert for Ballarat, Australia. Analyze the provided text description and classify the waste item according to Ballarat's recycling standards.
-
-        \(ballaratRecyclingStandards)
->>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
+        BIN TYPES:
+        - red: General waste (landfill)
+        - yellow: Paper and plastic recycling
+        - green: Food waste and green waste
+        - purple: Glass recycling
+        - ewaste: E-waste (batteries, electronics, computers, phones, appliances)
+        - other: Take to transfer station (large items, hazardous materials)
 
         Respond with a JSON object in this exact format:
         {
             "itemName": "exact item name",
-<<<<<<< HEAD
-            "binType": "red|yellow|green|purple|ewaste|other|none",
+            "binType": "red|yellow|green|purple|ewaste|other",
             "description": "brief description of the item",
-            "instructions": "specific disposal instructions for Ballarat",
-            "confidence": 0.95,
+            "instructions": "specific disposal instructions",
+            "confidence": 0.95
         }
-
-        CRITICAL CLASSIFICATION RULES:
-        - RED BIN: General waste, nappies, soft plastics, coffee cups, meat trays, non-recyclables
-        - YELLOW BIN: Clean empty cans, plastic bottles/containers, paper/cardboard (NO LIDS)
-        - GREEN BIN: Food scraps, garden waste, leaves, prunings, organic matter, flowers
-        - PURPLE BIN: Glass bottles/jars (NO LIDS)
-        - E-WASTE: Batteries, electronics, computers, phones, appliances
-        - OTHER: Building materials, chemicals, large items (take to transfer station)
-        - NONE: Only when truly unidentifiable
-
-        MANDATORY EXAMPLES - Follow these exactly:
-        - Input: "aluminum can" OR "aluminium can" OR "Coke can" → Output: {"binType": "yellow"}
-        - Input: "plastic bottle" OR "water bottle" (clean, empty) → Output: {"binType": "yellow"}
-        - Input: "glass bottle" OR "wine bottle" OR "jar" (clean, empty) → Output: {"binType": "purple"}
-        - Input: "food scraps" OR "banana peel" OR "garden waste" OR "flowers" → Output: {"binType": "green"}
-        - Input: "battery" OR "phone" OR "electronics" → Output: {"binType": "ewaste"}
-        - Input: "soft plastic" OR "plastic bag" OR "coffee cup" → Output: {"binType": "red"}
-        - Input: "building materials" OR "chemicals" → Output: {"binType": "other"}
-        
-        CRITICAL: If you say "red bin" in instructions, you MUST use binType: "red"
-        CRITICAL: If you say "yellow bin" in instructions, you MUST use binType: "yellow"
-        CRITICAL: If you say "green bin" in instructions, you MUST use binType: "green"
-        CRITICAL: If you say "purple bin" in instructions, you MUST use binType: "purple"
-        CRITICAL: If you say "e-waste" or "transfer station" in instructions, you MUST use binType: "ewaste" or "other"
-=======
-            "binType": "yellow|red|green|purple|special|none",
-            "description": "brief description of the item",
-            "instructions": "specific disposal instructions for Ballarat",
-            "confidence": 0.95,
-            "isSpecialCollection": false,
-            "specialCollectionType": null,
-
-        }
-
-        CRITICAL CLASSIFICATION RULES:
-        - ALUMINUM/ALUMINIUM CANS → binType: "yellow" (NEVER "none")
-        - PLASTIC BOTTLES/CONTAINERS → binType: "yellow"
-        - GLASS BOTTLES/JARS → binType: "purple" 
-        - FOOD SCRAPS/ORGANIC → binType: "green"
-        - BATTERIES/ELECTRONICS → binType: "special"
-        - NON-RECYCLABLES → binType: "red"
-        - UNKNOWN/UNCLEAR → binType: "none"
-
-        MANDATORY EXAMPLES - Follow these exactly:
-        - Input: "aluminum can" OR "aluminium can" OR "Coke can" → Output: {"binType": "yellow"}
-        - Input: "plastic bottle" OR "water bottle" → Output: {"binType": "yellow"}
-        - Input: "glass bottle" OR "wine bottle" OR "jar" → Output: {"binType": "purple"}
-        - Input: "food scraps" OR "banana peel" → Output: {"binType": "green"}
-        - Input: "battery" OR "phone" OR "electronics" → Output: {"binType": "special"}
-        
-        CRITICAL: If you say "yellow bin" in instructions, you MUST use binType: "yellow"
-        CRITICAL: If you say "purple bin" in instructions, you MUST use binType: "purple"
-        CRITICAL: If you say "green bin" in instructions, you MUST use binType: "green"
-        CRITICAL: If you say "red bin" in instructions, you MUST use binType: "red"
->>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
         """
         
         return [
@@ -809,5 +344,3 @@ SPECIAL COLLECTION:
             "temperature": AIConfig.temperature
         ]
     }
-}
-   

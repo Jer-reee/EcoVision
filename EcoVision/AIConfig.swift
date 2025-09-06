@@ -13,11 +13,7 @@ struct AIConfig {
     /// OpenAI API Key
     /// Get your API key from: https://platform.openai.com/api-keys
     /// Replace this with your actual API key for production use
-<<<<<<< HEAD
     static let openAIAPIKey = "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"
-=======
-    static let openAIAPIKey = "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"
->>>>>>> 34aeaf9aad77d5674179840e228bfa9c34761e6a
     
     // MARK: - AI Model Configuration
     
