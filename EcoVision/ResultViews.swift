@@ -7,6 +7,7 @@
 
 import SwiftUI
 import MessageUI
+import GoogleMaps
 
 // MARK: - AI Recognition Result View
 
@@ -16,6 +17,8 @@ public struct AIResultView: View {
     @Binding var showingResult: Bool
     @Binding var showingReportError: Bool
     @Binding var showingManualSearch: Bool
+    @State private var selectedLocation: Location? = nil
+    @State private var showingMapDetail: Bool = false
     
     private var binColor: Color {
         switch aiResult.binType {
@@ -196,6 +199,33 @@ public struct AIResultView: View {
                         }
                     }
                     .padding(.top, min(geometry.size.height * 0.02, 16))
+                    
+                    // Map Section for specific bin types
+                    if aiResult.binType == .ewaste || aiResult.binType == .purple || aiResult.binType == .other {
+                        VStack(alignment: .leading, spacing: min(geometry.size.height * 0.015, 12)) {
+                            Text("Collection Points")
+                                .font(.system(size: min(geometry.size.width * 0.045, 18), weight: .semibold))
+                                .foregroundColor(Color.brandVeryDarkBlue)
+                            
+                            let mapLocations = getMapLocations(for: aiResult.binType)
+                            SimpleMapView(
+                                selectedLocation: $selectedLocation,
+                                locations: mapLocations
+                            )
+                            .frame(height: min(geometry.size.height * 0.25, 200))
+                            .cornerRadius(min(geometry.size.width * 0.02, 8))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: min(geometry.size.width * 0.02, 8))
+                                    .stroke(Color.brandMutedBlue.opacity(0.2), lineWidth: 1)
+                            )
+                            .onChange(of: selectedLocation) { oldValue, newValue in
+                                if newValue != nil {
+                                    showingMapDetail = true
+                                }
+                            }
+                        }
+                        .padding(.top, min(geometry.size.height * 0.02, 16))
+                    }
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.horizontal, min(geometry.size.width * 0.03, 12))
@@ -205,6 +235,385 @@ public struct AIResultView: View {
         }
         }
         .background(Color.brandWhite)
+        .sheet(isPresented: $showingMapDetail) {
+            if let location = selectedLocation {
+                MapDetailView(showingMapDetail: $showingMapDetail, location: location)
+            }
+        }
+    }
+    
+    
+    // Helper function to get map locations based on bin type
+    private func getMapLocations(for binType: AIService.BinType) -> [Location] {
+        // Real Ballarat waste dropoff locations
+        let allLocations: [Location] = [
+            // E-Waste Locations
+            Location(
+                name: "Ballarat Transfer Station",
+                address: "119 Gillies Street South, Alfredton VIC 3350",
+                latitude: -37.566762,
+                longitude: 143.816442,
+                type: .ewaste,
+                openingHours: "Mon-Fri: 8:00am-4:00pm; Sat-Sun: 10:00am-4:00pm",
+                website: "https://ballarat.vic.gov.au/property/waste-and-recycling/transfer-station",
+                acceptedItems: [
+                    "Electronic waste and appliances",
+                    "Computers, TVs, and mobile devices",
+                    "Small household electronics"
+                ]
+            ),
+            Location(
+                name: "Garden Recycling Centre",
+                address: "154 Learmonth Street, Alfredton VIC 3350",
+                latitude: -37.567207,
+                longitude: 143.808512,
+                type: .ewaste,
+                openingHours: "Mon-Sat: 7:30am-4:30pm; Sun: Closed",
+                website: "https://gardenrecyclingcentre.com.au",
+                acceptedItems: [
+                    "Electronic waste collection",
+                    "Garden waste and organics",
+                    "Recyclable materials"
+                ]
+            ),
+            Location(
+                name: "Officeworks Ballarat",
+                address: "118-122 Creswick Rd, Ballarat Central VIC 3350",
+                latitude: -37.554527,
+                longitude: 143.854601,
+                type: .ewaste,
+                openingHours: "Mon-Fri: 7:00am-7:00pm; Sat: 8:00am-6:00pm; Sun: 9:00am-6:00pm",
+                website: "https://www.officeworks.com.au/shop/officeworks/storepage/W364/VIC/Ballarat",
+                acceptedItems: [
+                    "Computers and laptops",
+                    "Printers and ink cartridges",
+                    "Mobile phones and accessories",
+                    "Small electronic devices"
+                ]
+            ),
+            
+            // Glass Recycling Locations
+            Location(
+                name: "Eastwood Street Shopping Centre",
+                address: "7/25 Eastwood Street, Ballarat Central VIC 3350",
+                latitude: -37.563391,
+                longitude: 143.8612,
+                type: .glass,
+                openingHours: "24/7 (street bin)",
+                website: "https://ballarat.vic.gov.au/glass-recycling",
+                acceptedItems: [
+                    "Glass bottles and jars",
+                    "Wine and beer bottles",
+                    "Food containers (glass only)"
+                ]
+            ),
+            Location(
+                name: "Bradlys Lane",
+                address: "Bradlys Lane, Bakery Hill VIC 3350",
+                latitude: -37.5639932,
+                longitude: 143.866433,
+                type: .glass,
+                openingHours: "24/7 (street bin)",
+                website: "https://ballarat.vic.gov.au/glass-recycling",
+                acceptedItems: [
+                    "Glass bottles and jars",
+                    "All colors of glass accepted",
+                    "Clean glass containers only"
+                ]
+            ),
+            Location(
+                name: "Midvale Shopping Centre",
+                address: "Shop 2, 1174 Geelong Road, Mount Clear VIC 3350",
+                latitude: -37.60459137,
+                longitude: 143.8668936,
+                type: .glass,
+                openingHours: "24/7 (shopping centre bin)",
+                website: "https://ballarat.vic.gov.au/glass-recycling",
+                acceptedItems: [
+                    "Glass bottles and jars",
+                    "Wine and spirit bottles",
+                    "Food jars and containers"
+                ]
+            ),
+            Location(
+                name: "Buninyong Recreation Reserve",
+                address: "401 Cornish St, Buninyong VIC 3357",
+                latitude: -37.6489583,
+                longitude: 143.8901109,
+                type: .glass,
+                openingHours: "24/7 (park bin)",
+                website: "https://ballarat.vic.gov.au/glass-recycling",
+                acceptedItems: [
+                    "Glass bottles and jars",
+                    "Beverage containers",
+                    "Food storage jars"
+                ]
+            ),
+            Location(
+                name: "Ballarat Greyhound Racing Club",
+                address: "605 Rubicon Street, Sebastopol VIC 3356",
+                latitude: -37.5853,
+                longitude: 143.8395,
+                type: .glass,
+                openingHours: "24/7 (club grounds bin)",
+                website: "https://ballarat.vic.gov.au/glass-recycling",
+                acceptedItems: [
+                    "Glass bottles and jars",
+                    "All glass beverage containers",
+                    "Clean glass only"
+                ]
+            ),
+            Location(
+                name: "Miners Rest General Store",
+                address: "200 Howe St, Miners Rest VIC 3352",
+                latitude: -37.4836794,
+                longitude: 143.8025531,
+                type: .glass,
+                openingHours: "24/7 (store bin)",
+                website: "https://ballarat.vic.gov.au/glass-recycling",
+                acceptedItems: [
+                    "Glass bottles and jars",
+                    "Wine and beer bottles",
+                    "Food containers"
+                ]
+            ),
+            Location(
+                name: "Stockland Wendouree Centre",
+                address: "330 Gillies Street North, Wendouree VIC 3355",
+                latitude: -37.532681,
+                longitude: 143.8238531,
+                type: .glass,
+                openingHours: "24/7 (shopping centre bin)",
+                website: "https://ballarat.vic.gov.au/glass-recycling",
+                acceptedItems: [
+                    "Glass bottles and jars",
+                    "Beverage containers",
+                    "Food storage containers"
+                ]
+            )
+        ]
+        
+        switch binType {
+        case .ewaste:
+            return allLocations.filter { $0.type == .ewaste }
+        case .purple:
+            // For glass, filter out the most distant locations to keep the map centered on Ballarat
+            let glassLocations = allLocations.filter { $0.type == .glass }
+            // Filter out locations that are too far from central Ballarat
+            return glassLocations.filter { location in
+                // Keep locations within reasonable distance of central Ballarat
+                let centralBallaratLat = -37.5634
+                let centralBallaratLng = 143.8500
+                let latDiff = abs(location.latitude - centralBallaratLat)
+                let lngDiff = abs(location.longitude - centralBallaratLng)
+                // Keep locations within ~0.1 degrees (about 11km) of central Ballarat
+                return latDiff < 0.1 && lngDiff < 0.1
+            }
+        case .other:
+            // For "other" bin type, show only the transfer station
+            return allLocations.filter { $0.name == "Ballarat Transfer Station" }
+        default:
+            return []
+        }
+    }
+}
+
+
+
+// MARK: - Simple Map View (for result pages)
+
+struct SimpleMapView: UIViewRepresentable {
+    @Binding var selectedLocation: Location?
+    let locations: [Location]
+    
+    func makeUIView(context: Context) -> GMSMapView {
+        let mapView = GMSMapView()
+        mapView.delegate = context.coordinator
+        
+        // Apply custom map style
+        do {
+            if let styleURL = Bundle.main.url(forResource: "map_style", withExtension: "json") {
+                mapView.mapStyle = try GMSMapStyle(contentsOfFileURL: styleURL)
+            } else {
+                // Fallback to inline style
+                mapView.mapStyle = try GMSMapStyle(jsonString: GoogleMapsConfig.mapStyleJSON)
+            }
+        } catch {
+            print("Error applying map style: \(error)")
+        }
+        
+        // Add markers
+        for location in locations {
+            let marker = GMSMarker()
+            marker.position = CLLocationCoordinate2D(
+                latitude: location.latitude,
+                longitude: location.longitude
+            )
+            marker.title = location.name
+            marker.snippet = location.address
+            marker.userData = location
+            marker.icon = GMSMarker.markerImage(with: markerColor(for: location.type))
+            marker.map = mapView
+        }
+        
+        // Fit camera to show all locations if there are any
+        if !locations.isEmpty {
+            fitCameraToLocations(mapView: mapView, locations: locations)
+        }
+        
+        return mapView
+    }
+    
+    func updateUIView(_ mapView: GMSMapView, context: Context) {
+        // Update markers if locations change
+        mapView.clear()
+        
+        for location in locations {
+            let marker = GMSMarker()
+            marker.position = CLLocationCoordinate2D(
+                latitude: location.latitude,
+                longitude: location.longitude
+            )
+            marker.title = location.name
+            marker.snippet = location.address
+            marker.userData = location
+            marker.icon = GMSMarker.markerImage(with: markerColor(for: location.type))
+            marker.map = mapView
+        }
+        
+        // Update camera position
+        if !locations.isEmpty {
+            fitCameraToLocations(mapView: mapView, locations: locations)
+        }
+    }
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    
+    private func fitCameraToLocations(mapView: GMSMapView, locations: [Location]) {
+        guard !locations.isEmpty else { return }
+        
+        print("🗺️ Fitting camera to \(locations.count) locations")
+        for (index, location) in locations.enumerated() {
+            print("🗺️ Location \(index): \(location.name) at \(location.latitude), \(location.longitude)")
+        }
+        
+        if locations.count == 1 {
+            // For single location, center on it with a good zoom level
+            let location = locations[0]
+            print("🗺️ Single location: centering on \(location.name) at \(location.latitude), \(location.longitude)")
+            let camera = GMSCameraPosition.camera(
+                withLatitude: location.latitude,
+                longitude: location.longitude,
+                zoom: 15.0
+            )
+            
+            // Smooth animation with duration
+            CATransaction.begin()
+            CATransaction.setAnimationDuration(1.2)
+            CATransaction.setAnimationTimingFunction(CAMediaTimingFunction(name: .easeInEaseOut))
+            mapView.animate(to: camera)
+            CATransaction.commit()
+            } else {
+            // For multiple locations, create bounds to fit all
+            var bounds = GMSCoordinateBounds()
+            for location in locations {
+                let coordinate = CLLocationCoordinate2D(
+                    latitude: location.latitude,
+                    longitude: location.longitude
+                )
+                bounds = bounds.includingCoordinate(coordinate)
+            }
+            
+            print("🗺️ Multiple locations: created bounds")
+            
+            // Check if bounds are too large (locations too spread out)
+            let northeast = bounds.northEast
+            let southwest = bounds.southWest
+            let centerLat = (northeast.latitude + southwest.latitude) / 2
+            let centerLng = (northeast.longitude + southwest.longitude) / 2
+            let latSpan = northeast.latitude - southwest.latitude
+            let lngSpan = northeast.longitude - southwest.longitude
+            print("🗺️ Bounds center: \(centerLat), \(centerLng)")
+            print("🗺️ Bounds span: \(latSpan), \(lngSpan)")
+            
+            // If the span is too large (> 0.5 degrees), center on the first few locations instead
+            if latSpan > 0.5 || lngSpan > 0.5 {
+                print("🗺️ Bounds too large, centering on first 3 locations")
+                let limitedLocations = Array(locations.prefix(3))
+                var limitedBounds = GMSCoordinateBounds()
+                for location in limitedLocations {
+                    let coordinate = CLLocationCoordinate2D(
+                        latitude: location.latitude,
+                        longitude: location.longitude
+                    )
+                    limitedBounds = limitedBounds.includingCoordinate(coordinate)
+                }
+                let update = GMSCameraUpdate.fit(limitedBounds, withPadding: 60.0)
+                
+                CATransaction.begin()
+                CATransaction.setAnimationDuration(0.8)
+                CATransaction.setAnimationTimingFunction(CAMediaTimingFunction(name: .easeInEaseOut))
+                mapView.animate(with: update)
+                CATransaction.commit()
+            } else {
+                // Add some padding around the bounds
+                let update = GMSCameraUpdate.fit(bounds, withPadding: 60.0)
+                
+                // Smooth animation with duration
+                CATransaction.begin()
+                CATransaction.setAnimationDuration(0.8)
+                CATransaction.setAnimationTimingFunction(CAMediaTimingFunction(name: .easeInEaseOut))
+                mapView.animate(with: update)
+                CATransaction.commit()
+            }
+        }
+    }
+    
+    class Coordinator: NSObject, GMSMapViewDelegate {
+        var parent: SimpleMapView
+        
+        init(_ parent: SimpleMapView) {
+            self.parent = parent
+        }
+        
+        func mapView(_ mapView: GMSMapView, didTap marker: GMSMarker) -> Bool {
+            if let location = marker.userData as? Location {
+                // Add pin bounce animation when tapped
+                animateMarkerBounce(marker: marker)
+                parent.selectedLocation = location
+            }
+            return true
+        }
+        
+        private func animateMarkerBounce(marker: GMSMarker) {
+            // Create a bouncing animation for the marker
+            let originalPosition = marker.position
+            
+            // Animate the marker slightly up and down for a bounce effect
+            CATransaction.begin()
+            CATransaction.setAnimationDuration(0.3)
+            CATransaction.setAnimationTimingFunction(CAMediaTimingFunction(name: .easeOut))
+            
+            // Move marker slightly north (up on map) for bounce effect
+            let bouncePosition = CLLocationCoordinate2D(
+                latitude: originalPosition.latitude + 0.0002,
+                longitude: originalPosition.longitude
+            )
+            marker.position = bouncePosition
+            
+            CATransaction.setCompletionBlock {
+                // Bounce back to original position
+                CATransaction.begin()
+                CATransaction.setAnimationDuration(0.2)
+                CATransaction.setAnimationTimingFunction(CAMediaTimingFunction(name: .easeIn))
+                marker.position = originalPosition
+                CATransaction.commit()
+            }
+            
+            CATransaction.commit()
+        }
     }
 }
 
@@ -227,24 +636,24 @@ public struct ManualSearchView: View {
          return ScrollableViewWithFloatingBack(backAction: {
              showingSearch = false
          }) {
-         VStack(spacing: 0) {
+        VStack(spacing: 0) {
                  // Captured Image Display - Full width at top
-             if let image = selectedImage {
-                 Image(uiImage: image)
-                     .resizable()
-                     .aspectRatio(contentMode: .fill)
+            if let image = selectedImage {
+                Image(uiImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
                      .frame(maxWidth: .infinity, maxHeight: 250)
-                     .clipped()
-             } else {
-                 Rectangle()
+                    .clipped()
+            } else {
+                Rectangle()
                          .fill(Color.gray.opacity(0.2))
                          .frame(maxWidth: .infinity, maxHeight: 250)
-                     .overlay(
-                         Image(systemName: "photo")
+                    .overlay(
+                        Image(systemName: "photo")
                                  .font(.system(size: 50))
                                  .foregroundColor(.gray.opacity(0.6))
-                     )
-             }
+                    )
+            }
             
             // Manual Search Interface
                 VStack(alignment: .center, spacing: 20) {

@@ -290,6 +290,10 @@ SPECIAL NOTES:
         CRITICAL: If you say "purple bin" in instructions, you MUST use binType: "purple"
         CRITICAL: If you say "e-waste" in instructions, you MUST use binType: "ewaste"
         CRITICAL: If you say "transfer station" in instructions, you MUST use binType: "other"
+        
+        CRITICAL GLASS RULE: GLASS BOTTLES/JARS NEVER GO IN YELLOW BIN (MIXED RECYCLING)
+        CRITICAL GLASS RULE: ALL GLASS GOES IN PURPLE BIN ONLY
+        CRITICAL GLASS RULE: WINE BOTTLES, BEER BOTTLES, GLASS JARS = PURPLE BIN
         """
         
         return [
@@ -613,6 +617,10 @@ SPECIAL NOTES:
         CRITICAL: If you say "purple bin" in instructions, you MUST use binType: "purple"
         CRITICAL: If you say "e-waste" in instructions, you MUST use binType: "ewaste"
         CRITICAL: If you say "transfer station" in instructions, you MUST use binType: "other"
+        
+        CRITICAL GLASS RULE: GLASS BOTTLES/JARS NEVER GO IN YELLOW BIN (MIXED RECYCLING)
+        CRITICAL GLASS RULE: ALL GLASS GOES IN PURPLE BIN ONLY
+        CRITICAL GLASS RULE: WINE BOTTLES, BEER BOTTLES, GLASS JARS = PURPLE BIN
         """
         
         return [

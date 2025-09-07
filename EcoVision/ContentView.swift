@@ -257,24 +257,57 @@ struct ContentView: View {
         let instructions = result.instructions.lowercased()
         let itemName = result.itemName.lowercased()
         
-        // Check for e-waste first (batteries, electronics, etc.)
-        if itemName.contains("battery") || itemName.contains("electronic") || itemName.contains("e-waste") || itemName.contains("computer") || itemName.contains("phone") || itemName.contains("appliance") ||
-           instructions.contains("battery") || instructions.contains("electronic") || instructions.contains("e-waste") || instructions.contains("computer") || instructions.contains("phone") || instructions.contains("appliance") {
-            return .ewaste
-        } else if instructions.contains("green bin") || instructions.contains("garden waste") || instructions.contains("organic") {
-            return .green
-        } else if instructions.contains("yellow bin") || instructions.contains("recycling") || instructions.contains("recyclable") {
-            return .yellow
-        } else if instructions.contains("red bin") || instructions.contains("general waste") || instructions.contains("landfill") {
-            return .red
-        } else if instructions.contains("purple bin") || instructions.contains("glass") {
+        print("🔍 FALLBACK ANALYSIS:")
+        print("📦 Item Name: '\(itemName)'")
+        print("📝 Instructions: '\(instructions)'")
+        print("🗑️ Original Bin Type: \(result.binType.rawValue)")
+        
+        // Check for GLASS FIRST - it has priority over other recycling
+        if instructions.contains("purple bin") || instructions.contains("glass") || 
+           itemName.contains("glass") || itemName.contains("wine") || itemName.contains("beer") ||
+           (itemName.contains("bottle") && (itemName.contains("glass") || itemName.contains("wine") || itemName.contains("beer"))) ||
+           (itemName.contains("jar") && itemName.contains("glass")) ||
+           instructions.contains("bottle") || instructions.contains("jar") || instructions.contains("wine") ||
+           instructions.contains("beer") || instructions.contains("container") {
+            print("🔄 FALLBACK: Detected Purple Bin (Glass) - GLASS DOES NOT GO IN YELLOW BIN")
             return .purple
-        } else if instructions.contains("transfer station") || instructions.contains("special collection") {
+        }
+        
+        // Check for e-waste (batteries, electronics, etc.)
+        else if itemName.contains("battery") || itemName.contains("electronic") || itemName.contains("e-waste") || itemName.contains("computer") || itemName.contains("phone") || itemName.contains("appliance") ||
+           instructions.contains("battery") || instructions.contains("electronic") || instructions.contains("e-waste") || instructions.contains("computer") || instructions.contains("phone") || instructions.contains("appliance") {
+            print("🔄 FALLBACK: Detected E-Waste")
+            return .ewaste
+        } 
+        
+        // Check for green bin (organic/garden waste)
+        else if instructions.contains("green bin") || instructions.contains("garden waste") || instructions.contains("organic") {
+            print("🔄 FALLBACK: Detected Green Bin")
+            return .green
+        } 
+        
+        // Check for yellow bin (mixed recycling) - BUT NOT GLASS
+        else if (instructions.contains("yellow bin") || instructions.contains("recycling") || instructions.contains("recyclable")) &&
+                !itemName.contains("glass") && !instructions.contains("glass") {
+            print("🔄 FALLBACK: Detected Yellow Bin (Mixed Recycling)")
+            return .yellow
+        } 
+        
+        // Check for red bin (general waste)
+        else if instructions.contains("red bin") || instructions.contains("general waste") || instructions.contains("landfill") {
+            print("🔄 FALLBACK: Detected Red Bin")
+            return .red
+        } 
+        
+        // Check for transfer station
+        else if instructions.contains("transfer station") || instructions.contains("special collection") {
+            print("🔄 FALLBACK: Detected Transfer Station")
             return .other
         }
         
-        // If no clear bin type found in instructions, return other
-        return .other
+        print("🔄 FALLBACK: No clear bin type found, keeping original: \(result.binType.rawValue)")
+        // If no clear bin type found in instructions, return original
+        return result.binType
     }
     
     private func checkCameraPermission() {

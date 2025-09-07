@@ -238,6 +238,13 @@ struct MapView: View {
     @Binding var showingMapDetail: Bool
     @Binding var selectedLocation: Location?
     @State private var selectedFilter = 0 // 0: E-Waste, 1: Glass
+    let initialFilter: Int?
+    
+    init(showingMapDetail: Binding<Bool>, selectedLocation: Binding<Location?>, initialFilter: Int? = nil) {
+        self._showingMapDetail = showingMapDetail
+        self._selectedLocation = selectedLocation
+        self.initialFilter = initialFilter
+    }
     
     // Real Ballarat waste dropoff locations
     private let allLocations: [Location] = [
@@ -527,7 +534,10 @@ struct MapView: View {
         }
         .background(Color.brandWhite)
         .onAppear {
-            // View appeared
+            // Set initial filter if provided
+            if let initialFilter = initialFilter {
+                selectedFilter = initialFilter
+            }
         }
     }
 }
