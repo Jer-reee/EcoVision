@@ -90,7 +90,7 @@ PURPLE BIN (Glass Recycling):
 - Window glass (broken-wrapped)
 - NO LIDS of any type
 
-E-WASTE (Take to Transfer Station):
+E-WASTE (Take to E-Waste Collection Point or Transfer Station):
 - Electronic waste (e-waste)
 - Batteries (car and household)
 - Cameras, computers (and parts)
@@ -106,6 +106,7 @@ E-WASTE (Take to Transfer Station):
 - Hearing aid batteries
 - Printers and printer cartridges
 - All electronic items cannot be placed in general waste bin
+- Take to designated e-waste collection points or transfer station
 
 OTHER (Take to Transfer Station):
 - Building waste (bricks, concrete, rubble etc)
@@ -155,18 +156,7 @@ SPECIAL NOTES:
         let instructions: String
         let confidence: Double
         
-        // Computed property to determine if this is a special collection
-        var isSpecialCollection: Bool {
-            return binType == .ewaste || binType == .other
-        }
-        
-        // Computed property to get the special collection type
-        var specialCollectionType: String? {
-            if isSpecialCollection {
-                return binType.rawValue
-            }
-            return nil
-        }
+        // All bin types use the same format - no special collections
     }
     
     enum BinType: String, CaseIterable {
@@ -176,7 +166,6 @@ SPECIAL NOTES:
         case purple = "Purple Bin"
         case ewaste = "E-Waste"
         case other = "Other"
-        case none = "No Bin"
         
         var color: String {
             switch self {
@@ -186,7 +175,6 @@ SPECIAL NOTES:
             case .purple: return "purple"
             case .ewaste: return "gray"
             case .other: return "gray"
-            case .none: return "gray"
             }
         }
         
@@ -196,9 +184,8 @@ SPECIAL NOTES:
             case .yellow: return "Yellow Bin"
             case .green: return "Green Bin"
             case .purple: return "Purple Bin"
-            case .ewaste: return "Grey Bin"
+            case .ewaste: return "Gray Bin"
             case .other: return "Transfer Station"
-            case .none: return "Grey Bin"
             }
         }
     }
@@ -261,14 +248,22 @@ SPECIAL NOTES:
             "confidence": 0.95,
         }
 
-        CLASSIFICATION RULES:
-        - Be very specific about the item name
-        - Use exact bin types: red, yellow, green, purple, ewaste, other, none
-        - CRITICAL: Always match the binType with your instructions
-        - CRITICAL: If you say "green bin" in instructions, you MUST use binType: "green"
-        - CRITICAL: If you say "yellow bin" in instructions, you MUST use binType: "yellow"
-        - CRITICAL: If you say "red bin" in instructions, you MUST use binType: "red"
-        - CRITICAL: If you say "purple bin" in instructions, you MUST use binType: "purple"
+        MANDATORY CLASSIFICATION RULES - NO EXCEPTIONS:
+        
+        IF YOU SEE ANY BATTERY (AA, AAA, 9V, car, household, hearing aid, etc.) → binType: "ewaste"
+        IF YOU SEE ANY ELECTRONIC (phone, computer, TV, camera, etc.) → binType: "ewaste"
+        IF YOU SEE ANY PAPER/CARDBOARD (box, newspaper, magazine) → binType: "yellow"
+        IF YOU SEE ANY GLASS (bottle, jar) → binType: "purple"
+        IF YOU SEE ANY FOOD/GARDEN WASTE → binType: "green"
+        IF YOU SEE ANY PLASTIC BOTTLE/CAN (clean, empty) → binType: "yellow"
+        IF YOU SEE ANY SOFT PLASTIC/BAG → binType: "red"
+        
+        ONLY use "other" for: building materials, chemicals, large furniture
+        ONLY use "none" if: completely unidentifiable
+        
+        CRITICAL: BATTERIES = E-WASTE ALWAYS
+        CRITICAL: ELECTRONICS = E-WASTE ALWAYS
+        CRITICAL: PAPER/CARDBOARD = YELLOW ALWAYS
         
         BIN TYPE MAPPING:
         - RED BIN: General waste, nappies, soft plastics, coffee cups, meat trays, non-recyclables
@@ -276,7 +271,7 @@ SPECIAL NOTES:
         - GREEN BIN: Food scraps, garden waste, leaves, prunings, organic matter, flowers
         - PURPLE BIN: Glass bottles/jars (NO LIDS)
         - E-WASTE: Batteries, electronics, computers, phones, appliances
-        - OTHER: Building materials, chemicals, large items (take to transfer station)
+        - OTHER: ONLY building materials, chemicals, large items (take to transfer station)
         - NONE: Only when truly unidentifiable
         
         MANDATORY EXAMPLES - Follow these exactly:
@@ -293,7 +288,8 @@ SPECIAL NOTES:
         CRITICAL: If you say "yellow bin" in instructions, you MUST use binType: "yellow"
         CRITICAL: If you say "green bin" in instructions, you MUST use binType: "green"
         CRITICAL: If you say "purple bin" in instructions, you MUST use binType: "purple"
-        CRITICAL: If you say "e-waste" or "transfer station" in instructions, you MUST use binType: "ewaste" or "other"
+        CRITICAL: If you say "e-waste" in instructions, you MUST use binType: "ewaste"
+        CRITICAL: If you say "transfer station" in instructions, you MUST use binType: "other"
         """
         
         return [
@@ -501,7 +497,7 @@ SPECIAL NOTES:
             throw AIError.invalidResponse
         }
         
-        let binType = BinType(rawValue: binTypeString) ?? .none
+        let binType = BinType(rawValue: binTypeString) ?? .other
         
         return WasteClassificationResult(
             itemName: itemName,
@@ -583,29 +579,40 @@ SPECIAL NOTES:
             "confidence": 0.95,
         }
 
-        CRITICAL CLASSIFICATION RULES:
-        - RED BIN: General waste, nappies, soft plastics, coffee cups, meat trays, non-recyclables
-        - YELLOW BIN: Clean empty cans, plastic bottles/containers, paper/cardboard (NO LIDS)
-        - GREEN BIN: Food scraps, garden waste, leaves, prunings, organic matter, flowers
-        - PURPLE BIN: Glass bottles/jars (NO LIDS)
-        - E-WASTE: Batteries, electronics, computers, phones, appliances
-        - OTHER: Building materials, chemicals, large items (take to transfer station)
-        - NONE: Only when truly unidentifiable
+        MANDATORY CLASSIFICATION RULES - NO EXCEPTIONS:
+        
+        IF TEXT CONTAINS "battery" OR "batteries" → binType: "ewaste"
+        IF TEXT CONTAINS "phone" OR "computer" OR "electronic" → binType: "ewaste"
+        IF TEXT CONTAINS "cardboard" OR "paper" OR "newspaper" → binType: "yellow"
+        IF TEXT CONTAINS "glass" OR "bottle" OR "jar" → binType: "purple"
+        IF TEXT CONTAINS "food" OR "garden" OR "organic" → binType: "green"
+        IF TEXT CONTAINS "plastic bottle" OR "can" (clean, empty) → binType: "yellow"
+        IF TEXT CONTAINS "soft plastic" OR "bag" → binType: "red"
+        
+        ONLY use "other" for: building materials, chemicals, large furniture
+        ONLY use "none" if: completely unidentifiable
+        
+        CRITICAL: BATTERIES = E-WASTE ALWAYS
+        CRITICAL: ELECTRONICS = E-WASTE ALWAYS
+        CRITICAL: PAPER/CARDBOARD = YELLOW ALWAYS
 
         MANDATORY EXAMPLES - Follow these exactly:
         - Input: "aluminum can" OR "aluminium can" OR "Coke can" → Output: {"binType": "yellow"}
         - Input: "plastic bottle" OR "water bottle" (clean, empty) → Output: {"binType": "yellow"}
         - Input: "glass bottle" OR "wine bottle" OR "jar" (clean, empty) → Output: {"binType": "purple"}
+        - Input: "battery" OR "batteries" OR "household battery" OR "car battery" → Output: {"binType": "ewaste"}
+        - Input: "phone" OR "computer" OR "laptop" OR "television" OR "TV" → Output: {"binType": "ewaste"}
         - Input: "food scraps" OR "banana peel" OR "garden waste" OR "flowers" → Output: {"binType": "green"}
-        - Input: "battery" OR "phone" OR "electronics" → Output: {"binType": "ewaste"}
         - Input: "soft plastic" OR "plastic bag" OR "coffee cup" → Output: {"binType": "red"}
+        - Input: "cardboard box" OR "newspaper" OR "magazine" OR "paper" → Output: {"binType": "yellow"}
         - Input: "building materials" OR "chemicals" → Output: {"binType": "other"}
         
         CRITICAL: If you say "red bin" in instructions, you MUST use binType: "red"
         CRITICAL: If you say "yellow bin" in instructions, you MUST use binType: "yellow"
         CRITICAL: If you say "green bin" in instructions, you MUST use binType: "green"
         CRITICAL: If you say "purple bin" in instructions, you MUST use binType: "purple"
-        CRITICAL: If you say "e-waste" or "transfer station" in instructions, you MUST use binType: "ewaste" or "other"
+        CRITICAL: If you say "e-waste" in instructions, you MUST use binType: "ewaste"
+        CRITICAL: If you say "transfer station" in instructions, you MUST use binType: "other"
         """
         
         return [

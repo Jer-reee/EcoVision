@@ -23,7 +23,6 @@ struct ContentView: View {
     @State private var showingMapDetail = false
     @State private var selectedLocation: Location?
     @State private var showingAIResult = false
-    @State private var showingNoBinResult = false
     @State private var showingManualSearch = false
     @State private var showingReportError = false
     @State private var userAddress = "807 Freehold Place" // Default address for demo
@@ -44,14 +43,8 @@ struct ContentView: View {
                         showingReportError: $showingReportError,
                         showingManualSearch: $showingManualSearch
                     )
-                } else if showingNoBinResult, let result = aiClassificationResult {
-                    NoBinResultView(
-                        aiResult: result,
-                        selectedImage: selectedImage,
-                        showingResult: $showingNoBinResult,
-                        showingReportError: $showingReportError,
-                        showingManualSearch: $showingManualSearch
-                    )
+                } else if showingReportError {
+                    ReportErrorView(showingReport: $showingReportError)
                 } else if showingManualSearch {
                     ManualSearchView(
                         selectedImage: selectedImage,
@@ -64,8 +57,6 @@ struct ContentView: View {
                         showingLoading: $showingAILoading,
                         showingReportError: $showingReportError
                     )
-                } else if showingReportError {
-                    ReportErrorView(showingReport: $showingReportError)
                 } else {
                     switch selectedTab {
                     case 0:
@@ -105,7 +96,7 @@ struct ContentView: View {
                 }
                 
                 // Bottom Navigation Bar (hidden when showing result views)
-                if !showingAIResult && !showingNoBinResult && !showingManualSearch && !showingReportError && !showingAILoading {
+                if !showingAIResult && !showingManualSearch && !showingReportError && !showingAILoading {
                     HStack(spacing: 0) {
                         NavigationTabView(
                             icon: "Tab Home",
@@ -207,10 +198,7 @@ struct ContentView: View {
             print("📝 Description: \(result.description)")
             print("📋 Instructions: \(result.instructions)")
             print("📊 Confidence: \(String(format: "%.2f", result.confidence * 100))%")
-            print("🔧 Special Collection: \(result.binType == .ewaste || result.binType == .other)")
-            if result.binType == .ewaste || result.binType == .other {
-                print("📦 Special Collection Type: \(result.binType.rawValue)")
-            }
+            // All bin types use the same format
 
             print("----------------------------------------")
             
@@ -227,8 +215,7 @@ struct ContentView: View {
     private func handleAIResult(_ result: AIService.WasteClassificationResult) async {
         print("🎯 ROUTING AI RESULT:")
         print("📦 Item: \(result.itemName)")
-        print("🗑️ Bin Type: \(result.binType.rawValue)")
-        print("🔄 Routing to: ", terminator: "")
+        print("🗑️ Original Bin Type: \(result.binType.rawValue)")
         
         await MainActor.run {
             showingAILoading = false
@@ -240,6 +227,7 @@ struct ContentView: View {
             // Create corrected result if fallback was used
             let correctedResult: AIService.WasteClassificationResult
             if finalBinType != result.binType {
+                print("🔄 Fallback: Detected \(finalBinType.rawValue) from item name or instructions")
                 print("🔄 Creating corrected result with bin type: \(finalBinType.rawValue)")
                 correctedResult = AIService.WasteClassificationResult(
                     itemName: result.itemName,
@@ -255,51 +243,39 @@ struct ContentView: View {
                 correctedResult = result
             }
             
-            switch finalBinType {
-            case .none, .other:
-                print("No Bin Result View")
-                showingNoBinResult = true
-            case .red, .yellow, .green, .purple, .ewaste:
-                print("AI Result View (Regular Bin)")
-                showingAIResult = true
-            }
+            print("🗑️ Final Bin Type: \(finalBinType.rawValue)")
+            print("🔄 Routing to: AI Result View (All Bin Types)")
+            
+            // ALL bin types use the same format - no exceptions
+            showingAIResult = true
         }
     }
     
     // MARK: - Fallback Routing Logic
     
     private func determineCorrectBinType(from result: AIService.WasteClassificationResult) -> AIService.BinType {
-        // If bin type is already correct, use it
-        if result.binType != .none {
-            return result.binType
-        }
-        
-        // Fallback: Analyze instructions to determine correct bin type
+        // Always analyze the result to determine the correct bin type
         let instructions = result.instructions.lowercased()
+        let itemName = result.itemName.lowercased()
         
-        if instructions.contains("green bin") || instructions.contains("garden waste") || instructions.contains("organic") {
-            print("🔄 Fallback: Detected green bin from instructions")
+        // Check for e-waste first (batteries, electronics, etc.)
+        if itemName.contains("battery") || itemName.contains("electronic") || itemName.contains("e-waste") || itemName.contains("computer") || itemName.contains("phone") || itemName.contains("appliance") ||
+           instructions.contains("battery") || instructions.contains("electronic") || instructions.contains("e-waste") || instructions.contains("computer") || instructions.contains("phone") || instructions.contains("appliance") {
+            return .ewaste
+        } else if instructions.contains("green bin") || instructions.contains("garden waste") || instructions.contains("organic") {
             return .green
         } else if instructions.contains("yellow bin") || instructions.contains("recycling") || instructions.contains("recyclable") {
-            print("🔄 Fallback: Detected yellow bin from instructions")
             return .yellow
         } else if instructions.contains("red bin") || instructions.contains("general waste") || instructions.contains("landfill") {
-            print("🔄 Fallback: Detected red bin from instructions")
             return .red
         } else if instructions.contains("purple bin") || instructions.contains("glass") {
-            print("🔄 Fallback: Detected purple bin from instructions")
             return .purple
-        } else if instructions.contains("battery") || instructions.contains("electronic") || instructions.contains("e-waste") || instructions.contains("computer") || instructions.contains("phone") || instructions.contains("appliance") {
-            print("🔄 Fallback: Detected e-waste from instructions")
-            return .ewaste
         } else if instructions.contains("transfer station") || instructions.contains("special collection") {
-            print("🔄 Fallback: Detected other/special collection from instructions")
             return .other
         }
         
-        // If no clear bin type found in instructions, return none
-        print("🔄 Fallback: No clear bin type found in instructions")
-        return .none
+        // If no clear bin type found in instructions, return other
+        return .other
     }
     
     private func checkCameraPermission() {
@@ -440,30 +416,6 @@ struct ReportErrorView: View {
                 }
                 .padding(.horizontal, 20)
                 .padding(.bottom, 80)
-                
-                // Back Button at bottom for better accessibility
-                Button(action: {
-                    showingReport = false
-                }) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "chevron.left")
-                        Text("Back")
-                    }
-                    .foregroundColor(Color.brandSkyBlue)
-                    .font(.system(size: 16, weight: .medium))
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 12)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.brandSkyBlue.opacity(0.1))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color.brandSkyBlue.opacity(0.3), lineWidth: 1)
-                            )
-                    )
-                }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 20)
             }
         }
         .background(Color.brandWhite)
@@ -480,17 +432,19 @@ class EmailService: NSObject, ObservableObject, MFMailComposeViewControllerDeleg
     @Published var emailResult: Result<MFMailComposeResult, Error>? = nil
     
     func sendErrorReport(userName: String, userEmail: String, problemDescription: String) {
-        // Option 1: Use EmailJS (recommended - free and easy)
+        // Use EmailJS only (device mail not configured)
         sendErrorReportViaEmailJS(userName: userName, userEmail: userEmail, problemDescription: problemDescription)
-        
-        // Option 2: Fallback to device mail app
-        // sendErrorReportViaDevice(userName: userName, userEmail: userEmail, problemDescription: problemDescription)
     }
     
     private func sendErrorReportViaEmailJS(userName: String, userEmail: String, problemDescription: String) {
+        print("📧 EMAILJS: Starting email send process")
+        print("📧 EMAILJS: Name: \(userName)")
+        print("📧 EMAILJS: Email: \(userEmail)")
+        print("📧 EMAILJS: Description: \(problemDescription)")
+        
         // EmailJS configuration - you'll need to set this up
         let serviceID = "EcoVision"  // Replace with your EmailJS service ID
-        let templateID = "template_hwowbx2"  // Replace with your EmailJS template ID
+        let templateID = "EcoVision"  // Replace with your EmailJS template ID
         let publicKey = "7BXsbzgSzFJVesCea"   // Replace with your EmailJS public key
         
         guard let url = URL(string: "https://api.emailjs.com/api/v1.0/email/send") else {
@@ -507,11 +461,11 @@ class EmailService: NSObject, ObservableObject, MFMailComposeViewControllerDeleg
             "template_id": templateID,
             "user_id": publicKey,
             "template_params": [
-                "from_email": "jarrysinszzj@gmail.com",  // Your sending email
-                "to_email": "jarrysinszzj@gmail.com",      // Your receiving email
-                "user_name": userName,
-                "user_email": userEmail,
-                "problem_description": problemDescription,
+                "from_email": "ecovisionballarat@gmail.com",  // Your sending email
+                "to_email": "ecovisionballarat@gmail.com",      // Your receiving email
+                "name": userName,
+                "email": userEmail,
+                "message": problemDescription,
                 "subject": "EcoVision App - Error Report"
             ]
         ]
@@ -525,8 +479,26 @@ class EmailService: NSObject, ObservableObject, MFMailComposeViewControllerDeleg
                         print("❌ EmailJS send failed: \(error.localizedDescription)")
                         self.emailResult = .failure(error)
                     } else {
-                        print("✅ Email sent successfully via EmailJS")
-                        self.emailResult = .success(.sent)
+                        print("✅ EmailJS response received")
+                        if let httpResponse = response as? HTTPURLResponse {
+                            print("📧 HTTP Status Code: \(httpResponse.statusCode)")
+                        }
+                        if let data = data {
+                            let responseString = String(data: data, encoding: .utf8) ?? "No response data"
+                            print("📧 EmailJS Response: \(responseString)")
+                            
+                            // Check if the response indicates success
+                            if responseString.contains("OK") || responseString.contains("success") {
+                                print("✅ Email sent successfully via EmailJS")
+                                self.emailResult = .success(.sent)
+                            } else {
+                                print("❌ EmailJS returned error: \(responseString)")
+                                self.emailResult = .failure(NSError(domain: "EmailJS", code: -1, userInfo: [NSLocalizedDescriptionKey: "EmailJS error: \(responseString)"]))
+                            }
+                        } else {
+                            print("❌ No response data from EmailJS")
+                            self.emailResult = .failure(NSError(domain: "EmailJS", code: -1, userInfo: [NSLocalizedDescriptionKey: "No response from EmailJS"]))
+                        }
                     }
                 }
             }.resume()
