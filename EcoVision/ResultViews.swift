@@ -38,17 +38,17 @@ public struct AIResultView: View {
                 Image(uiImage: image)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
-                        .frame(height: 250)
+                    .frame(maxWidth: .infinity, maxHeight: 250)
                     .clipped()
             } else {
                 Rectangle()
-                        .fill(Color.gray.opacity(0.2))
-                        .frame(height: 250)
+                    .fill(Color.gray.opacity(0.2))
+                    .frame(maxWidth: .infinity, maxHeight: 250)
                     .overlay(
                         Image(systemName: "photo")
-                                .font(.system(size: 50))
-                                .foregroundColor(.gray.opacity(0.6))
-                        )
+                            .font(.system(size: 50))
+                            .foregroundColor(.gray.opacity(0.6))
+                    )
                 }
                 
                 // Content Section
