@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import GooglePlaces
 
 // MARK: - Profile View
 
@@ -20,16 +19,16 @@ struct ProfileView: View {
 
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Header
-            Text("Profile")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-                .foregroundColor(Color.brandVeryDarkBlue)
-                .padding(.top, 20)
-                .padding(.bottom, 30)
-            
-            VStack(alignment: .leading, spacing: 24) {
+        GeometryReader { geometry in
+            VStack(spacing: 0) {
+                // Header
+                Text("Profile")
+                    .font(.system(size: min(geometry.size.width * 0.08, 34), weight: .bold))
+                    .foregroundColor(Color.brandVeryDarkBlue)
+                    .padding(.top, min(geometry.size.height * 0.025, 20))
+                    .padding(.bottom, min(geometry.size.height * 0.04, 30))
+                
+                VStack(alignment: .leading, spacing: 0) {
                 // Address Section
                 AddressDisplayView(address: $address)
                     .onChange(of: address) { oldValue, newValue in
@@ -38,71 +37,89 @@ struct ProfileView: View {
                             wasteService.fetchWasteCollection(for: newValue)
                         }
                     }
+                    .padding(.horizontal, min(geometry.size.width * 0.05, 20))
+                    .padding(.bottom, min(geometry.size.height * 0.03, 24))
                 
                 // Notifications Section
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Notification:")
-                        .font(.system(size: 16))
-                        .fontWeight(.medium)
-                        .foregroundColor(Color.brandVeryDarkBlue)
-                    
-                    Toggle("", isOn: $notificationsEnabled)
-                        .labelsHidden()
-                        .scaleEffect(0.8)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .onChange(of: notificationsEnabled) { oldValue, enabled in
-                            handleNotificationToggle(enabled: enabled)
+                VStack(alignment: .leading, spacing: min(geometry.size.height * 0.02, 16)) {
+                    HStack {
+                        Text("Notification:")
+                            .font(.system(size: min(geometry.size.width * 0.045, 18), weight: .semibold))
+                            .foregroundColor(Color.brandVeryDarkBlue)
+                        
+                        if notificationsEnabled {
+                            Spacer()
+                            
+                            Text("Reminder Time")
+                                .font(.system(size: min(geometry.size.width * 0.045, 18), weight: .semibold))
+                                .foregroundColor(Color.brandVeryDarkBlue)
+                                .transition(.asymmetric(
+                                    insertion: .move(edge: .trailing).combined(with: .opacity),
+                                    removal: .move(edge: .trailing).combined(with: .opacity)
+                                ))
+                                .animation(.easeInOut(duration: 0.3), value: notificationsEnabled)
                         }
+                    }
                     
-                    Text("Reminder Time\n(the day before)")
-                        .font(.system(size: 16))
-                        .fontWeight(.medium)
-                        .foregroundColor(Color.brandVeryDarkBlue)
-                        .padding(.top, 8)
-                    
-                    DatePicker("", selection: $reminderTime, displayedComponents: .hourAndMinute)
-                        .labelsHidden()
-                        .scaleEffect(0.9)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .disabled(!notificationsEnabled)
-                        .onChange(of: reminderTime) { oldValue, newTime in
-                            if notificationsEnabled && !wasteService.collectionData.isEmpty {
-                                scheduleNotifications()
+                    HStack {
+                        Toggle("", isOn: $notificationsEnabled)
+                            .labelsHidden()
+                            .scaleEffect(min(geometry.size.width * 0.002, 0.8))
+                            .onChange(of: notificationsEnabled) { oldValue, enabled in
+                                handleNotificationToggle(enabled: enabled)
                             }
+                        
+                        if notificationsEnabled {
+                            Spacer()
+                            
+                            DatePicker("", selection: $reminderTime, displayedComponents: .hourAndMinute)
+                                .labelsHidden()
+                                .scaleEffect(min(geometry.size.width * 0.0022, 0.9))
+                                .onChange(of: reminderTime) { oldValue, newTime in
+                                    if notificationsEnabled && !wasteService.collectionData.isEmpty {
+                                        scheduleNotifications()
+                                    }
+                                }
+                                .transition(.asymmetric(
+                                    insertion: .move(edge: .trailing).combined(with: .opacity),
+                                    removal: .move(edge: .trailing).combined(with: .opacity)
+                                ))
+                                .animation(.easeInOut(duration: 0.3), value: notificationsEnabled)
                         }
+                    }
                     
                     // Notification Status
                     if notificationsEnabled {
                         HStack {
                             Image(systemName: "bell.fill")
                                 .foregroundColor(Color.brandSkyBlue)
-                                .font(.caption)
+                                .font(.system(size: min(geometry.size.width * 0.03, 12)))
                             
                             Text("Reminders scheduled")
-                                .font(.caption)
+                                .font(.system(size: min(geometry.size.width * 0.03, 12)))
                                 .foregroundColor(Color.brandMutedBlue)
                         }
-                        .padding(.top, 4)
+                        .padding(.top, min(geometry.size.height * 0.01, 8))
                     }
                 }
+                .padding(.horizontal, min(geometry.size.width * 0.05, 20))
                 
                 // Collection Information Section
                 if !wasteService.collectionData.isEmpty {
-                    VStack(alignment: .leading, spacing: 12) {
+                    VStack(alignment: .leading, spacing: min(geometry.size.height * 0.02, 16)) {
                         Text("Your Collection Schedule:")
-                            .font(.system(size: 16))
-                            .fontWeight(.medium)
+                            .font(.system(size: min(geometry.size.width * 0.045, 18), weight: .semibold))
                             .foregroundColor(Color.brandVeryDarkBlue)
                         
                         ForEach(Array(wasteService.collectionData.prefix(1)), id: \.id) { record in
-                            VStack(alignment: .leading, spacing: 8) {
+                            VStack(alignment: .leading, spacing: min(geometry.size.height * 0.015, 12)) {
                                 // Show collection day and address info
                                 if let collectionDay = record.collectionDay, let address = record.address {
                                     Text("Collections for \(address)")
-                                        .font(.system(size: 12))
+                                        .font(.system(size: min(geometry.size.width * 0.03, 12)))
                                         .foregroundColor(Color.brandMutedBlue)
                                     Text("Collection Day: \(collectionDay)")
-                                        .font(.system(size: 12))
+                                        .font(.system(size: min(geometry.size.width * 0.03, 12)))
                                         .foregroundColor(Color.brandMutedBlue)
                                 }
                                 
@@ -111,22 +128,21 @@ struct ProfileView: View {
                                     HStack {
                                         Rectangle()
                                             .fill(collection.color)
-                                            .frame(width: 20, height: 20)
-                                            .cornerRadius(4)
+                                            .frame(width: min(geometry.size.width * 0.05, 20), height: min(geometry.size.width * 0.05, 20))
+                                            .cornerRadius(min(geometry.size.width * 0.01, 4))
                                         
-                                        VStack(alignment: .leading, spacing: 2) {
+                                        VStack(alignment: .leading, spacing: min(geometry.size.height * 0.005, 4)) {
                                             Text(collection.type)
-                                                .font(.system(size: 14))
-                                                .fontWeight(.medium)
+                                                .font(.system(size: min(geometry.size.width * 0.035, 14), weight: .medium))
                                                 .foregroundColor(Color.brandVeryDarkBlue)
                                             
-                                            VStack(alignment: .leading, spacing: 1) {
+                                            VStack(alignment: .leading, spacing: min(geometry.size.height * 0.003, 3)) {
                                                 Text("Next: \(collection.date)")
-                                                    .font(.system(size: 12))
+                                                    .font(.system(size: min(geometry.size.width * 0.03, 12)))
                                                     .foregroundColor(Color.brandMutedBlue)
                                                 
                                                 Text(frequencyText(for: collection.frequency))
-                                                    .font(.system(size: 11))
+                                                    .font(.system(size: min(geometry.size.width * 0.027, 11)))
                                                     .foregroundColor(Color.brandMutedBlue.opacity(0.8))
                                             }
                                         }
@@ -137,28 +153,27 @@ struct ProfileView: View {
                             }
                         }
                     }
-                    .padding(.top, 20)
+                    .padding(.horizontal, min(geometry.size.width * 0.05, 20))
+                    .padding(.top, min(geometry.size.height * 0.025, 20))
                 } else if wasteService.isLoading {
                     HStack {
                         ProgressView()
-                            .scaleEffect(0.8)
+                            .scaleEffect(min(geometry.size.width * 0.002, 0.8))
                         Text("Loading collection data...")
-                            .font(.system(size: 14))
+                            .font(.system(size: min(geometry.size.width * 0.035, 14)))
                             .foregroundColor(Color.brandMutedBlue)
                     }
-                    .padding(.top, 20)
+                    .padding(.top, min(geometry.size.height * 0.025, 20))
                 } else if let errorMessage = wasteService.errorMessage {
                     Text("Error: \(errorMessage)")
-                        .font(.system(size: 14))
+                        .font(.system(size: min(geometry.size.width * 0.035, 14)))
                         .foregroundColor(.red)
-                        .padding(.top, 20)
+                        .padding(.top, min(geometry.size.height * 0.025, 20))
                 }
             }
-            .padding(.horizontal, 20)
-            
-            Spacer()
+            }
+            .background(Color.brandWhite)
         }
-        .background(Color.brandWhite)
         .onAppear {
             // Initialize notification state
             notificationsEnabled = notificationManager.isNotificationPermissionGranted
@@ -259,12 +274,11 @@ struct AddressDisplayView: View {
     @State private var showingAddressEdit = false
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 0) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Address:")
-                        .font(.system(size: 16))
-                        .fontWeight(.medium)
+                        .font(.system(size: 18, weight: .semibold))
                         .foregroundColor(Color.brandVeryDarkBlue)
                     
                     if address.isEmpty {
@@ -299,228 +313,126 @@ struct AddressDisplayView: View {
                 }
             }
         }
-        .sheet(isPresented: $showingAddressEdit) {
-            AddressEditSheet(
-                selectedAddress: $address,
-                isPresented: $showingAddressEdit
-            )
+            .sheet(isPresented: $showingAddressEdit) {
+                AddressEditSheet(
+                    selectedAddress: $address,
+                    isPresented: $showingAddressEdit
+                )
+            }
         }
     }
-}
 
 // MARK: - Address Edit Sheet
 
 struct AddressEditSheet: View {
     @Binding var selectedAddress: String
     @Binding var isPresented: Bool
-    @StateObject private var placesService = GooglePlacesService()
-    @State private var searchText = ""
-    @State private var showingResults = false
-    @State private var isSearching = false
-    @State private var searchTimer: Timer?
+    @State private var addressText = ""
     
     var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
-                // Header
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("Select Your Address")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundColor(Color.brandVeryDarkBlue)
-                    
-                    Text("Search for your address in the Ballarat area to get personalized waste collection schedules.")
-                        .font(.system(size: 14))
-                        .foregroundColor(Color.brandMutedBlue)
-                        .lineLimit(nil)
-                }
-                .padding(.horizontal, 20)
-                .padding(.top, 20)
-                .padding(.bottom, 20)
-                
-                // Search Section
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Search Address:")
-                        .font(.system(size: 16))
-                        .fontWeight(.medium)
-                        .foregroundColor(Color.brandVeryDarkBlue)
-                    
-                    // Search TextField
-                    HStack {
-                        Image(systemName: "magnifyingglass")
-                            .foregroundColor(Color.brandMutedBlue)
-                            .font(.system(size: 16))
-                        
-                        TextField("Start typing your address...", text: $searchText)
-                            .font(.system(size: 14))
+        GeometryReader { geometry in
+            NavigationView {
+                VStack(spacing: 0) {
+                    // Header
+                    VStack(alignment: .leading, spacing: min(geometry.size.height * 0.02, 16)) {
+                        Text("Enter Your Address")
+                            .font(.system(size: min(geometry.size.width * 0.06, 22), weight: .bold))
                             .foregroundColor(Color.brandVeryDarkBlue)
-                            .onChange(of: searchText) { oldValue, newValue in
-                                handleSearchTextChange(newValue)
-                            }
                         
-                        if !searchText.isEmpty {
-                            Button(action: {
-                                searchText = ""
-                                placesService.clearResults()
-                                showingResults = false
-                            }) {
-                                Image(systemName: "xmark.circle.fill")
-                                    .foregroundColor(Color.brandMutedBlue)
-                                    .font(.system(size: 16))
-                            }
-                        }
+                        Text("Enter your full address in the Ballarat area to get personalized waste collection schedules.")
+                            .font(.system(size: min(geometry.size.width * 0.035, 14)))
+                            .foregroundColor(Color.brandMutedBlue)
+                            .lineLimit(nil)
                     }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 10)
-                    .background(Color.brandWhite)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.brandSkyBlue, lineWidth: 1)
-                    )
-                    
-                    // Search Results
-                    if showingResults && !placesService.searchResults.isEmpty {
-                        ScrollView {
-                            LazyVStack(spacing: 0) {
-                                ForEach(placesService.searchResults.prefix(10)) { result in
-                                    Button(action: {
-                                        selectAddress(result)
-                                    }) {
-                                        VStack(alignment: .leading, spacing: 4) {
-                                            Text(result.name)
-                                                .font(.system(size: 14))
-                                                .fontWeight(.medium)
-                                                .foregroundColor(Color.brandVeryDarkBlue)
-                                                .frame(maxWidth: .infinity, alignment: .leading)
-                                            
-                                            Text(result.address)
-                                                .font(.system(size: 12))
-                                                .foregroundColor(Color.brandMutedBlue)
-                                                .frame(maxWidth: .infinity, alignment: .leading)
-                                                .lineLimit(2)
-                                        }
-                                        .padding(.horizontal, 12)
-                                        .padding(.vertical, 12)
-                                        .background(Color.brandWhite)
-                                    }
-                                    .buttonStyle(PlainButtonStyle())
-                                    
-                                    if result.id != placesService.searchResults.prefix(10).last?.id {
-                                        Divider()
-                                            .background(Color.brandMutedBlue.opacity(0.2))
-                                            .padding(.horizontal, 12)
-                                    }
-                                }
-                            }
-                        }
-                        .background(Color.brandWhite)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color.brandSkyBlue.opacity(0.3), lineWidth: 1)
-                        )
-                        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
-                        .frame(maxHeight: 300)
-                    }
-                    
-                    // Loading Indicator
-                    if placesService.isLoading {
-                        HStack {
-                            ProgressView()
-                                .scaleEffect(0.8)
-                            Text("Searching addresses in Ballarat...")
-                                .font(.system(size: 12))
+                    .padding(.horizontal, min(geometry.size.width * 0.05, 20))
+                    .padding(.top, min(geometry.size.height * 0.025, 20))
+                    .padding(.bottom, min(geometry.size.height * 0.025, 20))
+                
+                    // Address Input Section
+                    VStack(alignment: .leading, spacing: min(geometry.size.height * 0.02, 16)) {
+                        VStack(alignment: .leading, spacing: min(geometry.size.height * 0.01, 8)) {
+                            Text("Address:")
+                                .font(.system(size: min(geometry.size.width * 0.04, 16), weight: .medium))
+                                .foregroundColor(Color.brandVeryDarkBlue)
+                            
+                            TextField("e.g., 123 Main Street, Ballarat VIC 3350", text: $addressText)
+                                .font(.system(size: min(geometry.size.width * 0.035, 14)))
+                                .foregroundColor(Color.brandVeryDarkBlue)
+                                .padding(.horizontal, min(geometry.size.width * 0.03, 12))
+                                .padding(.vertical, min(geometry.size.height * 0.012, 10))
+                                .background(Color.brandWhite)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: min(geometry.size.width * 0.02, 8))
+                                        .stroke(Color.brandSkyBlue, lineWidth: 1)
+                                )
+                            
+                            Text("Please enter your full address including street number, street name, suburb, and postcode.")
+                                .font(.system(size: min(geometry.size.width * 0.03, 12)))
                                 .foregroundColor(Color.brandMutedBlue)
+                                .lineLimit(nil)
                         }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
+                    
+                        // Example addresses for reference
+                        VStack(alignment: .leading, spacing: min(geometry.size.height * 0.01, 8)) {
+                            Text("Example addresses:")
+                                .font(.system(size: min(geometry.size.width * 0.035, 14), weight: .medium))
+                                .foregroundColor(Color.brandVeryDarkBlue)
+                            
+                            VStack(alignment: .leading, spacing: min(geometry.size.height * 0.005, 4)) {
+                                Text("• 123 Sturt Street, Ballarat Central VIC 3350")
+                                Text("• 45 Lydiard Street North, Ballarat VIC 3350")
+                                Text("• 789 Wendouree Parade, Lake Wendouree VIC 3350")
+                            }
+                            .font(.system(size: min(geometry.size.width * 0.03, 12)))
+                            .foregroundColor(Color.brandMutedBlue)
+                        }
+                    }
+                    .padding(.horizontal, min(geometry.size.width * 0.05, 20))
+                
+                    // Current Selection Display
+                    if !selectedAddress.isEmpty {
+                        VStack(alignment: .leading, spacing: min(geometry.size.height * 0.01, 8)) {
+                            Text("Current Address:")
+                                .font(.system(size: min(geometry.size.width * 0.035, 14), weight: .medium))
+                                .foregroundColor(Color.brandVeryDarkBlue)
+                            
+                            Text(selectedAddress)
+                                .font(.system(size: min(geometry.size.width * 0.035, 14)))
+                                .foregroundColor(Color.brandMutedBlue)
+                                .padding(.horizontal, min(geometry.size.width * 0.03, 12))
+                                .padding(.vertical, min(geometry.size.height * 0.01, 8))
+                                .background(Color.brandSkyBlue.opacity(0.1))
+                                .cornerRadius(min(geometry.size.width * 0.02, 8))
+                        }
+                        .padding(.horizontal, min(geometry.size.width * 0.05, 20))
+                        .padding(.bottom, min(geometry.size.height * 0.025, 20))
+                    }
+                }
+                .background(Color.brandWhite)
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button("Cancel") {
+                            isPresented = false
+                        }
+                        .foregroundColor(Color.brandSkyBlue)
                     }
                     
-                    // Error Message
-                    if let errorMessage = placesService.errorMessage {
-                        Text(errorMessage)
-                            .font(.system(size: 12))
-                            .foregroundColor(.red)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 4)
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button("Save") {
+                            selectedAddress = addressText
+                            isPresented = false
+                        }
+                        .foregroundColor(Color.brandSkyBlue)
+                        .fontWeight(.medium)
+                        .disabled(addressText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                     }
-                }
-                .padding(.horizontal, 20)
-                
-                Spacer()
-                
-                // Current Selection Display
-                if !selectedAddress.isEmpty {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Selected Address:")
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(Color.brandVeryDarkBlue)
-                        
-                        Text(selectedAddress)
-                            .font(.system(size: 14))
-                            .foregroundColor(Color.brandMutedBlue)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
-                            .background(Color.brandSkyBlue.opacity(0.1))
-                            .cornerRadius(8)
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 20)
                 }
             }
-            .background(Color.brandWhite)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        isPresented = false
-                    }
-                    .foregroundColor(Color.brandSkyBlue)
-                }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
-                        isPresented = false
-                    }
-                    .foregroundColor(Color.brandSkyBlue)
-                    .fontWeight(.medium)
-                }
+            .onAppear {
+                // Initialize with current address
+                addressText = selectedAddress
             }
         }
-        .onAppear {
-            // Initialize search text with current address
-            searchText = selectedAddress
-        }
-        .onDisappear {
-            // Clean up when view disappears
-            searchTimer?.invalidate()
-            placesService.cancelRequests()
-            placesService.clearResults()
-            showingResults = false
-        }
-    }
-    
-    // MARK: - Helper Methods
-    
-    private func handleSearchTextChange(_ newValue: String) {
-        // Cancel previous timer
-        searchTimer?.invalidate()
-        
-        if !newValue.isEmpty && newValue.count >= 2 {
-            // Debounce search by 300ms to avoid too many API calls
-            searchTimer = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: false) { _ in
-                showingResults = true
-                placesService.searchAddresses(query: newValue)
-            }
-        } else {
-            showingResults = false
-            placesService.clearResults()
-        }
-    }
-    
-    private func selectAddress(_ result: PlaceResult) {
-        selectedAddress = result.address
-        searchText = result.address
-        showingResults = false
-        placesService.clearResults()
     }
 }

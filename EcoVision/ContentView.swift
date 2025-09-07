@@ -10,7 +10,6 @@ import SwiftUI
 import PhotosUI
 import AVFoundation
 import Foundation
-import GooglePlaces
 import MessageUI
 
 struct ContentView: View {

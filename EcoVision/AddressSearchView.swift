@@ -6,154 +6,65 @@
 //
 
 import SwiftUI
-import GooglePlaces
 
 // MARK: - Address Search View
 
 struct AddressSearchView: View {
     @Binding var selectedAddress: String
-    @StateObject private var placesService = GooglePlacesService()
-    @State private var searchText = ""
-    @State private var showingResults = false
-    @State private var isSearching = false
+    @State private var addressText = ""
     
     var onAddressSelected: ((String) -> Void)?
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            // Search TextField
-            HStack {
-                Image(systemName: "magnifyingglass")
-                    .foregroundColor(Color.brandMutedBlue)
-                    .font(.system(size: 16))
-                
-                TextField("Start typing your address...", text: $searchText)
-                    .font(.system(size: 14))
-                    .foregroundColor(Color.brandVeryDarkBlue)
-                    .onChange(of: searchText) { oldValue, newValue in
-                        handleSearchTextChange(newValue)
-                    }
-                
-                if !searchText.isEmpty {
-                    Button(action: {
-                        searchText = ""
-                        placesService.clearResults()
-                        showingResults = false
-                    }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(Color.brandMutedBlue)
-                            .font(.system(size: 16))
-                    }
-                }
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
-            .background(Color.brandWhite)
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color.brandSkyBlue, lineWidth: 1)
-            )
-            
-            // Search Results Dropdown
-            if showingResults && !placesService.searchResults.isEmpty {
-                VStack(spacing: 0) {
-                    ForEach(placesService.searchResults.prefix(5)) { result in
-                        Button(action: {
-                            selectAddress(result)
-                        }) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(result.name)
-                                    .font(.system(size: 14))
-                                    .fontWeight(.medium)
-                                    .foregroundColor(Color.brandVeryDarkBlue)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                
-                                Text(result.address)
-                                    .font(.system(size: 12))
-                                    .foregroundColor(Color.brandMutedBlue)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .lineLimit(2)
-                            }
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 10)
-                            .background(Color.brandWhite)
+        GeometryReader { geometry in
+            VStack(alignment: .leading, spacing: min(geometry.size.height * 0.02, 16)) {
+                // Address Input Field
+                VStack(alignment: .leading, spacing: min(geometry.size.height * 0.01, 8)) {
+                    Text("Enter your address")
+                        .font(.system(size: min(geometry.size.width * 0.04, 16), weight: .medium))
+                        .foregroundColor(Color.brandVeryDarkBlue)
+                    
+                    TextField("e.g., 123 Main Street, Ballarat VIC 3350", text: $addressText)
+                        .font(.system(size: min(geometry.size.width * 0.035, 14)))
+                        .foregroundColor(Color.brandVeryDarkBlue)
+                        .padding(.horizontal, min(geometry.size.width * 0.03, 12))
+                        .padding(.vertical, min(geometry.size.height * 0.012, 10))
+                        .background(Color.brandWhite)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: min(geometry.size.width * 0.02, 8))
+                                .stroke(Color.brandSkyBlue, lineWidth: 1)
+                        )
+                        .onChange(of: addressText) { oldValue, newValue in
+                            selectedAddress = newValue
+                            onAddressSelected?(newValue)
                         }
-                        .buttonStyle(PlainButtonStyle())
-                        
-                        if result.id != placesService.searchResults.prefix(5).last?.id {
-                            Divider()
-                                .background(Color.brandMutedBlue.opacity(0.2))
-                                .padding(.horizontal, 12)
-                        }
-                    }
-                }
-                .background(Color.brandWhite)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.brandSkyBlue.opacity(0.3), lineWidth: 1)
-                )
-                .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
-                .zIndex(1)
-            }
-            
-            // Loading Indicator
-            if placesService.isLoading {
-                HStack {
-                    ProgressView()
-                        .scaleEffect(0.8)
-                    Text("Searching addresses...")
-                        .font(.system(size: 12))
+                    
+                    Text("Please enter your full address including street number, street name, suburb, and postcode.")
+                        .font(.system(size: min(geometry.size.width * 0.03, 12)))
                         .foregroundColor(Color.brandMutedBlue)
+                        .lineLimit(nil)
                 }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
+                
+                // Example addresses for reference
+                VStack(alignment: .leading, spacing: min(geometry.size.height * 0.01, 8)) {
+                    Text("Example addresses:")
+                        .font(.system(size: min(geometry.size.width * 0.035, 14), weight: .medium))
+                        .foregroundColor(Color.brandVeryDarkBlue)
+                    
+                    VStack(alignment: .leading, spacing: min(geometry.size.height * 0.005, 4)) {
+                        Text("• 123 Sturt Street, Ballarat Central VIC 3350")
+                        Text("• 45 Lydiard Street North, Ballarat VIC 3350")
+                        Text("• 789 Wendouree Parade, Lake Wendouree VIC 3350")
+                    }
+                    .font(.system(size: min(geometry.size.width * 0.03, 12)))
+                    .foregroundColor(Color.brandMutedBlue)
+                }
             }
-            
-            // Error Message
-            if let errorMessage = placesService.errorMessage {
-                Text(errorMessage)
-                    .font(.system(size: 12))
-                    .foregroundColor(.red)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 4)
+            .onAppear {
+                // Initialize with current address
+                addressText = selectedAddress
             }
         }
-        .onAppear {
-            // Initialize search text with current address
-            searchText = selectedAddress
-        }
-        .onDisappear {
-            // Clean up when view disappears
-            placesService.cancelRequests()
-            placesService.clearResults()
-            showingResults = false
-        }
-    }
-    
-    // MARK: - Helper Methods
-    
-    private func handleSearchTextChange(_ newValue: String) {
-        // Update the selected address as user types
-        selectedAddress = newValue
-        
-        // Trigger search with debounce
-        if !newValue.isEmpty && newValue.count >= 3 {
-            showingResults = true
-            placesService.searchAddresses(query: newValue)
-        } else {
-            showingResults = false
-            placesService.clearResults()
-        }
-    }
-    
-    private func selectAddress(_ result: PlaceResult) {
-        selectedAddress = result.address
-        searchText = result.address
-        showingResults = false
-        placesService.clearResults()
-        
-        // Call the callback if provided
-        onAddressSelected?(result.address)
     }
 }
 

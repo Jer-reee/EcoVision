@@ -29,119 +29,120 @@ public struct AIResultView: View {
     }
     
     public var body: some View {
-        ScrollableViewWithFloatingBack(backAction: {
-                    showingResult = false
-                }) {
-            VStack(spacing: 0) {
-                // Captured Image Display - Full width at top
+        GeometryReader { geometry in
+            ScrollableViewWithFloatingBack(backAction: {
+                        showingResult = false
+                    }) {
+                VStack(spacing: 0) {
+                    // Captured Image Display - Full width at top
             if let image = selectedImage {
                 Image(uiImage: image)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
-                    .frame(maxWidth: .infinity, maxHeight: 250)
+                        .frame(maxWidth: .infinity, maxHeight: min(geometry.size.height * 0.3, 250))
                     .clipped()
             } else {
                 Rectangle()
-                    .fill(Color.gray.opacity(0.2))
-                    .frame(maxWidth: .infinity, maxHeight: 250)
+                        .fill(Color.gray.opacity(0.2))
+                        .frame(maxWidth: .infinity, maxHeight: min(geometry.size.height * 0.3, 250))
                     .overlay(
                         Image(systemName: "photo")
-                            .font(.system(size: 50))
-                            .foregroundColor(.gray.opacity(0.6))
-                    )
-                }
-                
-                // Content Section
-                VStack(alignment: .center, spacing: 22) {
+                                .font(.system(size: min(geometry.size.width * 0.12, 50)))
+                                .foregroundColor(.gray.opacity(0.6))
+                        )
+                    }
+                    
+                    // Content Section
+                    VStack(alignment: .center, spacing: min(geometry.size.height * 0.03, 22)) {
                     // Item Name and Bin Type Row
-                     HStack(alignment: .center, spacing: 16) {
-                         // Item Name (LEFT)
-                         VStack(alignment: .center, spacing: 9) {
-                             Text(aiResult.itemName)
-                                 .font(.title2)
-                                 .fontWeight(.bold)
-                                 .foregroundColor(Color.brandVeryDarkBlue)
+                     VStack(spacing: min(geometry.size.height * 0.02, 16)) {
+                         // Item Name - Centered with safe margins
+                         VStack(alignment: .center, spacing: min(geometry.size.height * 0.01, 9)) {
+                Text(aiResult.itemName)
+                                 .font(.system(size: min(geometry.size.width * 0.08, 28), weight: .bold))
+                    .foregroundColor(Color.brandVeryDarkBlue)
                                  .lineLimit(2)
-                                 .minimumScaleFactor(0.8)
+                                 .minimumScaleFactor(0.7)
                                  .multilineTextAlignment(.center)
+                                 .padding(.horizontal, min(geometry.size.width * 0.15, 60))
                          }
-                         .frame(maxWidth: .infinity, alignment: .center)
                          
-                         // Bin Icon (RIGHT)
-                         VStack(alignment: .center, spacing: 6) {
+                         // Bin Icon - Positioned below with proper spacing
+                         VStack(alignment: .center, spacing: min(geometry.size.height * 0.008, 6)) {
                              // ALL bin types use the same image display logic
+                             let iconSize = min(geometry.size.width * 0.12, 50)
                              if let image = UIImage(named: aiResult.binImageName) {
                                  Image(uiImage: image)
-                                     .resizable()
-                                     .aspectRatio(contentMode: .fit)
-                                     .frame(width: 50, height: 50)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                                      .frame(width: iconSize, height: iconSize)
                              } else {
                                  // ALL bin types use the same fallback
                                  Image(systemName: "trash.fill")
-                                     .font(.system(size: 30))
+                                     .font(.system(size: iconSize * 0.6))
                                      .foregroundColor(binColor)
-                                     .frame(width: 50, height: 50)
+                                     .frame(width: iconSize, height: iconSize)
                              }
                              
-                             Text(aiResult.binType.rawValue)
-                                 .font(.system(size: 12, weight: .medium))
-                                 .foregroundColor(binColor)
-                                 .lineLimit(1)
-                                 .minimumScaleFactor(0.7)
-                                 .multilineTextAlignment(.center)
+                        Text(aiResult.binType.rawValue)
+                                      .font(.system(size: min(geometry.size.width * 0.03, 12), weight: .medium))
+                                      .foregroundColor(binColor)
+                                      .lineLimit(1)
+                                      .minimumScaleFactor(0.6)
+                                      .multilineTextAlignment(.center)
                          }
                      }
                     
                     // Description Section
-                    VStack(alignment: .center, spacing: 8) {
+                    VStack(alignment: .center, spacing: min(geometry.size.height * 0.01, 8)) {
                         Text("Description:")
-                            .font(.system(size: 18, weight: .medium))
+                            .font(.system(size: min(geometry.size.width * 0.045, 18), weight: .medium))
                             .foregroundColor(Color.brandVeryDarkBlue)
                             .multilineTextAlignment(.center)
                 
                 Text(aiResult.description)
-                            .font(.system(size: 16))
+                            .font(.system(size: min(geometry.size.width * 0.04, 16)))
                             .foregroundColor(Color.brandVeryDarkBlue)
                             .lineLimit(nil)
                             .multilineTextAlignment(.center)
-                            .padding(12)
+                            .padding(min(geometry.size.width * 0.03, 12))
                             .background(
-                                RoundedRectangle(cornerRadius: 12)
+                                RoundedRectangle(cornerRadius: min(geometry.size.width * 0.03, 12))
                                     .fill(Color.brandWhite)
                                     .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
                             )
                             .overlay(
-                                RoundedRectangle(cornerRadius: 12)
+                                RoundedRectangle(cornerRadius: min(geometry.size.width * 0.03, 12))
                                     .stroke(Color.brandMutedBlue.opacity(0.3), lineWidth: 1)
                             )
                     }
                     
                     // Disposal Instructions Section
-                    VStack(alignment: .center, spacing: 8) {
+                    VStack(alignment: .center, spacing: min(geometry.size.height * 0.01, 8)) {
                         Text("Disposal instructions:")
-                            .font(.system(size: 18, weight: .medium))
+                            .font(.system(size: min(geometry.size.width * 0.045, 18), weight: .medium))
                     .foregroundColor(Color.brandVeryDarkBlue)
                     .multilineTextAlignment(.center)
                 
                 Text(aiResult.instructions)
-                            .font(.system(size: 16))
+                            .font(.system(size: min(geometry.size.width * 0.04, 16)))
                     .foregroundColor(Color.brandVeryDarkBlue)
                             .lineLimit(nil)
                     .multilineTextAlignment(.center)
-                            .padding(12)
+                            .padding(min(geometry.size.width * 0.03, 12))
                             .background(
-                                RoundedRectangle(cornerRadius: 12)
+                                RoundedRectangle(cornerRadius: min(geometry.size.width * 0.03, 12))
                                     .fill(Color.brandWhite)
                                     .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
                             )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
+                    .overlay(
+                                RoundedRectangle(cornerRadius: min(geometry.size.width * 0.03, 12))
                                     .stroke(Color.brandMutedBlue.opacity(0.3), lineWidth: 1)
                             )
                     }
                     
                     // Action Buttons
-                    HStack(spacing: 12) {
+                    HStack(spacing: min(geometry.size.width * 0.03, 12)) {
                         // Manual Search Button
                         Button(action: {
                             showingResult = false
@@ -149,20 +150,20 @@ public struct AIResultView: View {
                                 showingManualSearch = true
                             }
                         }) {
-                            HStack(spacing: 4) {
+                            HStack(spacing: min(geometry.size.width * 0.01, 4)) {
                                 Text("Not correct?")
-                                    .font(.system(size: 13))
+                                    .font(.system(size: min(geometry.size.width * 0.032, 13)))
                                 Text("Try searching manually")
-                                    .font(.system(size: 13, weight: .medium))
+                                    .font(.system(size: min(geometry.size.width * 0.032, 13), weight: .medium))
                             }
                             .foregroundColor(Color.brandSkyBlue)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
+                            .padding(.horizontal, min(geometry.size.width * 0.03, 12))
+                            .padding(.vertical, min(geometry.size.height * 0.01, 8))
                             .background(
-                                RoundedRectangle(cornerRadius: 8)
+                                RoundedRectangle(cornerRadius: min(geometry.size.width * 0.02, 8))
                                     .fill(Color.brandSkyBlue.opacity(0.1))
                                     .overlay(
-                                        RoundedRectangle(cornerRadius: 8)
+                                        RoundedRectangle(cornerRadius: min(geometry.size.width * 0.02, 8))
                                             .stroke(Color.brandSkyBlue.opacity(0.3), lineWidth: 1)
                                     )
                             )
@@ -175,32 +176,33 @@ public struct AIResultView: View {
                         showingReportError = true
                     }
                 }) {
-                            HStack(spacing: 4) {
+                            HStack(spacing: min(geometry.size.width * 0.01, 4)) {
                         Text("Report Error")
-                                    .font(.system(size: 13))
+                                    .font(.system(size: min(geometry.size.width * 0.032, 13)))
                         Image(systemName: "exclamationmark.circle")
-                                    .font(.system(size: 12))
+                                    .font(.system(size: min(geometry.size.width * 0.03, 12)))
                             }
                             .foregroundColor(.red)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
+                            .padding(.horizontal, min(geometry.size.width * 0.03, 12))
+                            .padding(.vertical, min(geometry.size.height * 0.01, 8))
                             .background(
-                                RoundedRectangle(cornerRadius: 8)
+                                RoundedRectangle(cornerRadius: min(geometry.size.width * 0.02, 8))
                                     .fill(Color.red.opacity(0.1))
                                     .overlay(
-                                        RoundedRectangle(cornerRadius: 8)
+                                        RoundedRectangle(cornerRadius: min(geometry.size.width * 0.02, 8))
                                             .stroke(Color.red.opacity(0.3), lineWidth: 1)
                                     )
                             )
                         }
                     }
-                    .padding(.top, 16)
+                    .padding(.top, min(geometry.size.height * 0.02, 16))
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.horizontal, 12)
-                .padding(.top, 16)
-                .padding(.bottom, 100)
+                .padding(.horizontal, min(geometry.size.width * 0.03, 12))
+                .padding(.top, min(geometry.size.height * 0.02, 16))
+                .padding(.bottom, min(geometry.size.height * 0.12, 100))
             }
+        }
         }
         .background(Color.brandWhite)
     }
@@ -222,27 +224,27 @@ public struct ManualSearchView: View {
     @StateObject private var aiService = AIService()
     
     public var body: some View {
-        return ScrollableViewWithFloatingBack(backAction: {
-            showingSearch = false
-        }) {
-        VStack(spacing: 0) {
-                // Captured Image Display - Full width at top
-            if let image = selectedImage {
-                Image(uiImage: image)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                        .frame(height: 250)
-                    .clipped()
-            } else {
-                Rectangle()
-                        .fill(Color.gray.opacity(0.2))
-                        .frame(height: 250)
-                    .overlay(
-                        Image(systemName: "photo")
-                                .font(.system(size: 50))
-                                .foregroundColor(.gray.opacity(0.6))
-                    )
-            }
+         return ScrollableViewWithFloatingBack(backAction: {
+             showingSearch = false
+         }) {
+         VStack(spacing: 0) {
+                 // Captured Image Display - Full width at top
+             if let image = selectedImage {
+                 Image(uiImage: image)
+                     .resizable()
+                     .aspectRatio(contentMode: .fill)
+                     .frame(maxWidth: .infinity, maxHeight: 250)
+                     .clipped()
+             } else {
+                 Rectangle()
+                         .fill(Color.gray.opacity(0.2))
+                         .frame(maxWidth: .infinity, maxHeight: 250)
+                     .overlay(
+                         Image(systemName: "photo")
+                                 .font(.system(size: 50))
+                                 .foregroundColor(.gray.opacity(0.6))
+                     )
+             }
             
             // Manual Search Interface
                 VStack(alignment: .center, spacing: 20) {

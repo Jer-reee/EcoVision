@@ -598,14 +598,12 @@ struct MapDetailView: View {
             }
             .padding(.horizontal, 20)
             .padding(.top, 20)
-            .padding(.bottom, 20)
+            .padding(.bottom, 10)
             
             // Google Maps Area for Detail View
             GoogleMapView(selectedLocation: .constant(nil), locations: [location])
-            .frame(height: 200)
+            .frame(height: 280)
             .padding(.horizontal, 20)
-            
-            Spacer()
             
             // Location Details
             VStack(alignment: .leading, spacing: 16) {

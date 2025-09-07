@@ -58,25 +58,26 @@ struct WasteCategoryView: View {
     let title: String
     let imageName: String
     let color: Color
+    let geometry: GeometryProxy
     
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: min(geometry.size.height * 0.02, 16)) {
             Text(title)
-                .font(.system(size: 15))
-                .fontWeight(.medium)
+                .font(.system(size: min(geometry.size.width * 0.035, 15), weight: .medium))
                 .foregroundColor(Color.brandVeryDarkBlue)
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
+                .minimumScaleFactor(0.8)
             
             Image(imageName)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
-                .frame(width: 80, height: 80)
+                .frame(width: min(geometry.size.width * 0.18, 80), height: min(geometry.size.width * 0.18, 80))
                 .foregroundColor(color)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.brandWhite)
-        .padding(.vertical, 20)
+        .padding(.vertical, min(geometry.size.height * 0.025, 20))
     }
 }
 
