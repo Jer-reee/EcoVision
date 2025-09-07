@@ -24,7 +24,7 @@ public struct AIResultView: View {
         case .green: return .green
         case .purple: return .purple
         case .ewaste: return .gray
-        case .other: return .transferStation
+        case .other: return .black
         }
     }
     
