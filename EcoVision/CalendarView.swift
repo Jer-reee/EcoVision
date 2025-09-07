@@ -21,139 +21,139 @@ struct CalendarView: View {
     }()
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Header
-            VStack(spacing: 8) {
-                Text("Calendar")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .foregroundColor(Color.brandVeryDarkBlue)
-                    .padding(.top, 20)
-                
-                // Loading indicator
-                if wasteService.isLoading {
-                    ProgressView("Loading collection data...")
-                        .font(.caption)
-                        .foregroundColor(Color.brandMutedBlue)
-                } else if let errorMessage = wasteService.errorMessage {
-                    Text(errorMessage)
-                        .font(.caption)
-                        .foregroundColor(.red)
-                } else if !wasteService.collectionData.isEmpty {
-                    Text("Collection schedule for \(userAddress)")
-                        .font(.caption)
-                        .foregroundColor(Color.brandMutedBlue)
-                }
-            }
-            
-            // Month Navigation
-            HStack {
-                Button(action: { changeMonth(-1) }) {
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(Color.brandSkyBlue)
-                        .font(.title2)
-                }
-                
-                Spacer()
-                
-                Text(dateFormatter.string(from: currentDate))
-                    .font(.title2)
-                    .fontWeight(.semibold)
-                    .foregroundColor(Color.brandVeryDarkBlue)
-                
-                Spacer()
-                
-                Button(action: { changeMonth(1) }) {
-                    Image(systemName: "chevron.right")
-                        .foregroundColor(Color.brandSkyBlue)
-                        .font(.title2)
-                }
-            }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 15)
-            
-            // Calendar Grid
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 5) {
-                // Weekday headers
-                ForEach(["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], id: \.self) { day in
-                    Text(day)
-                        .font(.caption)
-                        .fontWeight(.medium)
-                        .foregroundColor(Color.brandMutedBlue)
-                        .frame(height: 30)
-                }
-                
-                // Calendar days
-                ForEach(calendarDays, id: \.self) { date in
-                    CalendarDayView(
-                        date: date, 
-                        currentDate: currentDate,
-                        collectionData: wasteService.collectionData
-                    )
-                }
-            }
-            .padding(.horizontal, 20)
-            
-            Spacer()
-            
-            // Legend
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Rectangle()
-                        .fill(.red)
-                        .frame(width: 20, height: 12)
-                    Text("Household Waste")
-                        .font(.caption)
+        GeometryReader { geometry in
+            VStack(spacing: 0) {
+                // Header
+                VStack(spacing: min(geometry.size.height * 0.01, 8)) {
+                    Text("Calendar")
+                        .font(.system(size: min(geometry.size.width * 0.08, 34), weight: .bold))
                         .foregroundColor(Color.brandVeryDarkBlue)
+                        .padding(.top, min(geometry.size.height * 0.025, 20))
                     
-                    Spacer()
-                    
-                    Rectangle()
-                        .fill(Color(red: 1.0, green: 0.859, blue: 0.345))
-                        .frame(width: 20, height: 12)
-                    Text("Mixed Recycling")
-                        .font(.caption)
-                        .foregroundColor(Color.brandVeryDarkBlue)
-                }
-                
-                HStack {
-                    Rectangle()
-                        .fill(.green)
-                        .frame(width: 20, height: 12)
-                    Text("FOGO")
-                        .font(.caption)
-                        .foregroundColor(Color.brandVeryDarkBlue)
-                    
-                    Spacer()
-                }
-                
-                if !wasteService.collectionData.isEmpty {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Collection Schedule:")
-                            .font(.caption)
-                            .fontWeight(.medium)
-                            .foregroundColor(Color.brandVeryDarkBlue)
-                            .padding(.top, 8)
-                        
-                        Text("• Red bins: Weekly")
-                            .font(.caption)
+                    // Loading indicator
+                    if wasteService.isLoading {
+                        ProgressView("Loading collection data...")
+                            .font(.system(size: min(geometry.size.width * 0.035, 14)))
                             .foregroundColor(Color.brandMutedBlue)
-                        
-                        Text("• Yellow & Green bins: Fortnightly")
-                            .font(.caption)
+                    } else if let errorMessage = wasteService.errorMessage {
+                        Text(errorMessage)
+                            .font(.system(size: min(geometry.size.width * 0.035, 14)))
+                            .foregroundColor(.red)
+                    } else if !wasteService.collectionData.isEmpty {
+                        Text("Collection schedule for \(userAddress)")
+                            .font(.system(size: min(geometry.size.width * 0.035, 14)))
                             .foregroundColor(Color.brandMutedBlue)
                     }
-                } else {
-                    Text("No collection data available")
-                        .font(.caption)
-                        .foregroundColor(Color.brandMutedBlue)
-                        .padding(.top, 8)
                 }
+            
+                // Month Navigation
+                HStack {
+                    Button(action: { changeMonth(-1) }) {
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(Color.brandSkyBlue)
+                            .font(.system(size: min(geometry.size.width * 0.06, 22)))
+                    }
+                    
+                    Spacer()
+                    
+                    Text(dateFormatter.string(from: currentDate))
+                        .font(.system(size: min(geometry.size.width * 0.05, 20), weight: .semibold))
+                        .foregroundColor(Color.brandVeryDarkBlue)
+                    
+                    Spacer()
+                    
+                    Button(action: { changeMonth(1) }) {
+                        Image(systemName: "chevron.right")
+                            .foregroundColor(Color.brandSkyBlue)
+                            .font(.system(size: min(geometry.size.width * 0.06, 22)))
+                    }
+                }
+                .padding(.horizontal, min(geometry.size.width * 0.05, 20))
+                .padding(.vertical, min(geometry.size.height * 0.02, 15))
+            
+                // Calendar Grid
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: min(geometry.size.width * 0.01, 5)) {
+                    // Weekday headers
+                    ForEach(["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], id: \.self) { day in
+                        Text(day)
+                            .font(.system(size: min(geometry.size.width * 0.035, 14), weight: .medium))
+                            .foregroundColor(Color.brandMutedBlue)
+                            .frame(height: min(geometry.size.height * 0.04, 30))
+                    }
+                    
+                    // Calendar days
+                    ForEach(calendarDays, id: \.self) { date in
+                        CalendarDayView(
+                            date: date, 
+                            currentDate: currentDate,
+                            collectionData: wasteService.collectionData,
+                            geometry: geometry
+                        )
+                    }
+                }
+                .padding(.horizontal, min(geometry.size.width * 0.05, 20))
+            
+            Spacer()
+                .frame(height: min(geometry.size.height * 0.02, 15))
+            
+                // Legend
+                VStack(alignment: .leading, spacing: min(geometry.size.height * 0.01, 8)) {
+                    HStack {
+                        Rectangle()
+                            .fill(.red)
+                            .frame(width: min(geometry.size.width * 0.05, 20), height: min(geometry.size.height * 0.015, 12))
+                        Text("Household Waste")
+                            .font(.system(size: min(geometry.size.width * 0.035, 14)))
+                            .foregroundColor(Color.brandVeryDarkBlue)
+                        
+                        Spacer()
+                        
+                        Rectangle()
+                            .fill(Color(red: 1.0, green: 0.859, blue: 0.345))
+                            .frame(width: min(geometry.size.width * 0.05, 20), height: min(geometry.size.height * 0.015, 12))
+                        Text("Mixed Recycling")
+                            .font(.system(size: min(geometry.size.width * 0.035, 14)))
+                            .foregroundColor(Color.brandVeryDarkBlue)
+                    }
+                    
+                    HStack {
+                        Rectangle()
+                            .fill(.green)
+                            .frame(width: min(geometry.size.width * 0.05, 20), height: min(geometry.size.height * 0.015, 12))
+                        Text("FOGO")
+                            .font(.system(size: min(geometry.size.width * 0.035, 14)))
+                            .foregroundColor(Color.brandVeryDarkBlue)
+                        
+                        Spacer()
+                    }
+                    
+                    if !wasteService.collectionData.isEmpty {
+                        VStack(alignment: .leading, spacing: min(geometry.size.height * 0.005, 4)) {
+                            Text("Collection Schedule:")
+                                .font(.system(size: min(geometry.size.width * 0.035, 14), weight: .medium))
+                                .foregroundColor(Color.brandVeryDarkBlue)
+                                .padding(.top, min(geometry.size.height * 0.01, 8))
+                            
+                            Text("• Red bins: Weekly")
+                                .font(.system(size: min(geometry.size.width * 0.035, 14)))
+                                .foregroundColor(Color.brandMutedBlue)
+                            
+                            Text("• Yellow & Green bins: Fortnightly")
+                                .font(.system(size: min(geometry.size.width * 0.035, 14)))
+                                .foregroundColor(Color.brandMutedBlue)
+                        }
+                    } else {
+                        Text("No collection data available")
+                            .font(.system(size: min(geometry.size.width * 0.035, 14)))
+                            .foregroundColor(Color.brandMutedBlue)
+                            .padding(.top, min(geometry.size.height * 0.01, 8))
+                    }
+                }
+                .padding(.horizontal, min(geometry.size.width * 0.05, 20))
+                .padding(.bottom, min(geometry.size.height * 0.03, 20))
             }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 100)
+            .background(Color.brandWhite)
         }
-        .background(Color.brandWhite)
         .onAppear {
             wasteService.fetchWasteCollection(for: userAddress)
         }
@@ -183,36 +183,37 @@ struct CalendarDayView: View {
     let date: Date
     let currentDate: Date
     let collectionData: [WasteCollectionRecord]
+    let geometry: GeometryProxy
     private let calendar = Calendar.current
     
     var body: some View {
-        VStack(spacing: 2) {
+        VStack(spacing: min(geometry.size.height * 0.002, 2)) {
             ZStack {
                 // Circle background for current date
                 if isToday {
                     Circle()
                         .fill(Color.brandSkyBlue.opacity(0.2))
-                        .frame(width: 28, height: 28)
+                        .frame(width: min(geometry.size.width * 0.07, 28), height: min(geometry.size.width * 0.07, 28))
                 }
                 
                 Text("\(calendar.component(.day, from: date))")
-                    .font(.system(size: 14))
+                    .font(.system(size: min(geometry.size.width * 0.035, 14)))
                     .fontWeight(isToday ? .bold : .regular)
                     .foregroundColor(isCurrentMonth ? Color.brandVeryDarkBlue : Color.gray)
             }
             
             // Real waste collection indicators with recurring dates
             if isCurrentMonth {
-                HStack(spacing: 1) {
+                HStack(spacing: min(geometry.size.width * 0.002, 1)) {
                     ForEach(collectionsForDate, id: \.type) { collection in
                         Rectangle()
                             .fill(collection.color)
-                            .frame(width: 8, height: 3)
+                            .frame(width: min(geometry.size.width * 0.02, 8), height: min(geometry.size.height * 0.004, 3))
                     }
                 }
             }
         }
-        .frame(height: 40)
+        .frame(height: min(geometry.size.height * 0.05, 40))
         .frame(maxWidth: .infinity)
     }
     

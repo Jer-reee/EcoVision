@@ -28,6 +28,7 @@ struct HomeView: View {
                         .font(.system(size: min(geometry.size.width * 0.04, 15)))
                         .foregroundColor(Color.brandMutedBlue)
                         .multilineTextAlignment(.center)
+                        .padding(.horizontal, min(geometry.size.width * 0.05, 20))
                 }
                 .padding(.bottom, min(geometry.size.height * 0.05, 30))
             
@@ -96,6 +97,7 @@ struct HomeView: View {
                         .font(.system(size: min(geometry.size.width * 0.05, 20), weight: .medium))
                         .foregroundColor(Color.brandVeryDarkBlue)
                         .multilineTextAlignment(.center)
+                        .padding(.horizontal, min(geometry.size.width * 0.05, 20))
                     
                     Image(systemName: "chevron.down")
                         .foregroundColor(Color.brandSkyBlue)
@@ -109,7 +111,6 @@ struct HomeView: View {
                             .aspectRatio(contentMode: .fit)
                             .frame(width: min(geometry.size.width * 0.2, 80), height: min(geometry.size.width * 0.2, 80))
                             .foregroundColor(Color.brandWhite)
-                            
                     }
                 }
                 

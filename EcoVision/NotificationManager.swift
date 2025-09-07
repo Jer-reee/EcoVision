@@ -13,10 +13,36 @@ class NotificationManager: NSObject, ObservableObject {
     static let shared = NotificationManager()
     
     @Published var isNotificationPermissionGranted = false
+    private var expirationTimer: Timer?
     
     private override init() {
         super.init()
         checkNotificationPermission()
+        startExpirationTimer()
+    }
+    
+    deinit {
+        expirationTimer?.invalidate()
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    private func startExpirationTimer() {
+        // Check for expired notifications every hour
+        expirationTimer = Timer.scheduledTimer(withTimeInterval: 3600, repeats: true) { _ in
+            self.removeExpiredNotifications()
+        }
+        
+        // Also check when app becomes active
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(appDidBecomeActive),
+            name: UIApplication.didBecomeActiveNotification,
+            object: nil
+        )
+    }
+    
+    @objc private func appDidBecomeActive() {
+        removeExpiredNotifications()
     }
     
     // MARK: - Permission Management
@@ -44,6 +70,34 @@ class NotificationManager: NSObject, ObservableObject {
         }
     }
     
+    // MARK: - Notification Expiration Management
+    
+    func removeExpiredNotifications() {
+        let center = UNUserNotificationCenter.current()
+        
+        center.getPendingNotificationRequests { requests in
+            let now = Date()
+            let expiredIdentifiers = requests.compactMap { request -> String? in
+                guard let userInfo = request.content.userInfo as? [String: Any],
+                      let expirationDateString = userInfo["expirationDate"] as? String,
+                      let expirationDate = ISO8601DateFormatter().date(from: expirationDateString) else {
+                    return nil
+                }
+                
+                // If notification has expired, mark for removal
+                if expirationDate < now {
+                    return request.identifier
+                }
+                return nil
+            }
+            
+            if !expiredIdentifiers.isEmpty {
+                center.removePendingNotificationRequests(withIdentifiers: expiredIdentifiers)
+                print("🗑️ Removed \(expiredIdentifiers.count) expired notifications")
+            }
+        }
+    }
+    
     // MARK: - Notification Scheduling
     
     func scheduleCollectionReminders(
@@ -51,8 +105,9 @@ class NotificationManager: NSObject, ObservableObject {
         reminderTime: DateComponents,
         userAddress: String
     ) {
-        // First remove all existing collection notifications
+        // First remove all existing collection notifications and expired ones
         cancelCollectionNotifications()
+        removeExpiredNotifications()
         
         guard isNotificationPermissionGranted else {
             print("⚠️ Notification permission not granted")
@@ -109,11 +164,15 @@ class NotificationManager: NSObject, ObservableObject {
         content.sound = .default
         content.badge = 1
         
+        // Add expiration date (24 hours from notification time)
+        let expirationDate = calendar.date(byAdding: .hour, value: 24, to: notificationDate) ?? notificationDate
+        
         // Add user info for tracking
         content.userInfo = [
             "collectionType": collection.type,
             "collectionDate": ISO8601DateFormatter().string(from: collectionDate),
-            "address": userAddress
+            "address": userAddress,
+            "expirationDate": ISO8601DateFormatter().string(from: expirationDate)
         ]
         
         // Create trigger
