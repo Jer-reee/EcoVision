@@ -26,4 +26,27 @@ post_install do |installer|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '17.0'
     end
   end
+  
+  # Disable resource copying scripts to avoid sandbox issues
+  installer.pods_project.targets.each do |target|
+    if target.name == 'Pods-EcoVision'
+      target.build_phases.each do |phase|
+        if phase.is_a?(Xcodeproj::Project::Object::PBXShellScriptBuildPhase)
+          if phase.name && phase.name.include?('Copy Pods Resources')
+            phase.run_only_for_deployment_postprocessing = true
+          end
+        end
+      end
+    end
+  end
+  
+  # Remove resource copying scripts entirely
+  installer.pods_project.targets.each do |target|
+    if target.name == 'Pods-EcoVision'
+      target.build_phases.delete_if do |phase|
+        phase.is_a?(Xcodeproj::Project::Object::PBXShellScriptBuildPhase) &&
+        phase.name && phase.name.include?('Copy Pods Resources')
+      end
+    end
+  end
 end
