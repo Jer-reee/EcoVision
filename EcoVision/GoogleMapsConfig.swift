@@ -15,7 +15,7 @@ struct GoogleMapsConfig {
     /// Google Maps API Key
     /// Replace this with your actual Google Maps API key
     /// Get one from: https://console.cloud.google.com/apis/credentials
-    static let apiKey = "AIzaSyCU2mgyuv8m41vA9uJWQc0YMMxcG-qF63s"
+    static let apiKey = "key"
     
     // MARK: - Initialization
     
