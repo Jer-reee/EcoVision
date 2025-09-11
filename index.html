@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>EcoVision — Support</title>
+  <meta name="description" content="EcoVision Ballarat support and help page — FAQs, contact, troubleshooting and release notes for the AI-powered recycling camera app specific to Ballarat's recycling guidelines." />
+  <meta name="keywords" content="EcoVision, Ballarat recycling, support, help, waste sorting, AI" />
+  <meta name="author" content="EcoVision" />
+  <style>
+    :root{--bg:#f6fbf7;--card:#ffffff;--muted:#6b7280;--accent:#1e4164;--radius:12px;--max-width:980px;font-family:Inter, system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial;}
+    html,body{height:100%;}
+    body{margin:0;background:linear-gradient(180deg,var(--bg),#eef6f1 60%);color:#0f172a;line-height:1.5;padding:40px 20px;display:flex;justify-content:center;align-items:flex-start;}
+    .container{width:100%;max-width:var(--max-width);}
+    header{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+    .logo{width:68px;height:68px;border-radius:14px;background:linear-gradient(135deg,var(--accent),#4a90e2);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:22px}
+    h1{margin:0;font-size:28px}
+    p.lead{margin:6px 0 0;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:1fr 360px;gap:20px;align-items:start}
+    @media (max-width:880px){.grid{grid-template-columns:1fr;}.sidebar{order:2}}
+    .card{background:var(--card);border-radius:var(--radius);box-shadow:0 6px 18px rgba(20,30,50,0.06);padding:22px}
+    .section + .section{margin-top:16px}
+    h2{margin:0 0 12px;font-size:18px}
+    .muted{color:var(--muted);font-size:14px}
+    .faq-item{border-radius:10px;padding:12px;margin-bottom:10px;border:1px solid rgba(16,24,40,0.04)}
+    .faq-question{display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+    .faq-question strong{font-size:15px}
+    .faq-answer{margin-top:10px;color:var(--muted);display:none}
+    label{display:block;font-size:13px;margin-bottom:6px;color:#111827}
+    input[type=text],input[type=email],textarea,select{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #e6eef4;font-size:14px;box-sizing:border-box}
+    textarea{min-height:110px}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;border:0;cursor:pointer;font-weight:600}
+    .btn-primary{background:var(--accent);color:#fff}
+    .btn-ghost{background:transparent;border:1px solid rgba(16,24,40,0.06)}
+    .meta{font-size:13px;color:var(--muted);margin-top:10px}
+    footer{margin-top:18px;color:var(--muted);font-size:13px;text-align:center}
+    .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(30,65,100,0.06);color:var(--accent);font-weight:600;font-size:13px}
+  </style>
+</head>
+<body>
+  <main class="container">
+    <header>
+      <div class="logo">EV</div>
+      <div>
+        <h1>EcoVision — Support</h1>
+        <p class="lead">Help and troubleshooting for EcoVision — following Ballarat's recycling guidelines.</p>
+      </div>
+    </header>
+    <div class="grid">
+      <section class="card main">
+        <div class="section">
+          <h2>Quick start</h2>
+          <p class="muted">Point your phone camera at an item and tap <span class="pill">Scan</span>. EcoVision will suggest the correct Ballarat bin and offer tips.</p>
+        </div>
+        <div class="section">
+          <h2>How it works</h2>
+          <p class="muted">EcoVision uses AI to identify waste items and matches them to Ballarat-specific recycling categories like glass, food waste, paper, and plastics. Always follow local council rules if uncertain.</p>
+        </div>
+        <div class="section">
+          <h2>Frequently Asked Questions</h2>
+          <div class="faq-item">
+            <div class="faq-question"><strong>How do I scan an item?</strong><span class="small">Tap the blue Scan button in the camera view.</span></div>
+            <div class="faq-answer">Open the app, allow camera access, point at the item so it fills most of the frame, then tap Scan. For best results, scan in good lighting and avoid motion blur.</div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question"><strong>Why didn’t EcoVision recognise my object?</strong><span class="small">Common causes and fixes</span></div>
+            <div class="faq-answer">If recognition fails, try moving closer, improving lighting, or removing clutter from the background. If the item is unusual or new, use the Send Feedback feature to help improve recognition.</div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question"><strong>Is EcoVision accurate for Ballarat’s recycling rules?</strong><span class="small">Ballarat-specific guidance</span></div>
+            <div class="faq-answer">Yes, EcoVision is tailored for Ballarat guidelines. If in doubt, consult the City of Ballarat recycling resources.</div>
+          </div>
+        </div>
+        <div class="section">
+          <h2>Release notes</h2>
+          <p class="muted">v1.0 — Initial release: AI camera scanning, Ballarat categories, feedback submission.</p>
+        </div>
+      </section>
+      <aside class="card sidebar">
+        <div class="section">
+          <h2>Contact & Support</h2>
+          <p class="muted">For help, send us an email or open the repository.</p>
+          <form id="supportForm" onsubmit="submitForm(event)">
+            <label for="name">Your name</label>
+            <input id="name" type="text" placeholder="Optional" />
+            <label for="email">Your email</label>
+            <input id="email" type="email" placeholder="you@example.com" required />
+            <label for="issue">Issue type</label>
+            <select id="issue">
+              <option>Bug report</option>
+              <option>Feature request</option>
+              <option>General question</option>
+            </select>
+            <label for="message">Message</label>
+            <textarea id="message" placeholder="Describe the issue and steps to reproduce (if applicable)" required></textarea>
+            <div style="display:flex;gap:10px;margin-top:12px">
+              <button class="btn btn-primary" type="submit">Send via email</button>
+              <button class="btn btn-ghost" type="button" onclick="openRepo()">Open GitHub repo</button>
+            </div>
+          </form>
+          <p class="meta">Support email: <a id="supportEmail" href="mailto:EcoVisionBallarat@gmail.com">EcoVisionBallarat@gmail.com</a></p>
+          <p class="meta">GitHub: <a href="https://github.com/Jer-reee/EcoVision" target="_blank" rel="noopener">github.com/Jer-reee/EcoVision</a></p>
+        </div>
+        <div class="section">
+          <h2>Troubleshooting tips</h2>
+          <ul class="muted">
+            <li>Allow camera permissions in your phone settings.</li>
+            <li>Restart the app after an update.</li>
+            <li>Ensure stable internet for feedback uploads; scanning works offline on-device for most items.</li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+    <footer>
+      <p>© EcoVision — Built by the EcoVision team. For support, email <a href="mailto:EcoVisionBallarat@gmail.com">EcoVisionBallarat@gmail.com</a></p>
+    </footer>
+  </main>
+  <script>
+    document.querySelectorAll('.faq-item').forEach(function(item){
+      item.querySelector('.faq-question').addEventListener('click', function(){
+        var ans = item.querySelector('.faq-answer');
+        var shown = ans.style.display === 'block';
+        document.querySelectorAll('.faq-answer').forEach(a=>a.style.display='none');
+        ans.style.display = shown ? 'none' : 'block';
+      });
+    });
+    function openRepo(){ window.open('https://github.com/Jer-reee/EcoVision','_blank'); }
+    function submitForm(e){
+      e.preventDefault();
+      var name = document.getElementById('name').value.trim();
+      var email = document.getElementById('email').value.trim();
+      var issue = document.getElementById('issue').value;
+      var message = document.getElementById('message').value.trim();
+      if(!email || !message){ alert('Please provide your email and a short message.'); return; }
+      var to = 'EcoVisionBallarat@gmail.com';
+      var subject = encodeURIComponent('EcoVision support: ' + issue);
+      var body = encodeURIComponent('Name: ' + name + '\nEmail: ' + email + '\n\n' + message + '\n\nApp: EcoVision');
+      window.location.href = 'mailto:'+to+'?subject='+subject+'&body='+body;
+    }
+  </script>
+</body>
+</html>
